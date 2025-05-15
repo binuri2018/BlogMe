@@ -1,7 +1,7 @@
 /* src/styles.css */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
+  background-color: #021454;
   margin: 0;
   padding: 0;
 }
@@ -49,7 +49,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ffffff;
+  background-color: #f6bae9;
   padding: 10px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
@@ -63,3 +63,14 @@ body {
   font-weight: bold;
   color: #555;
 }
+
+.navbar-username {
+  cursor: pointer;
+  color: #0029bb;
+  transition: color 0.3s;
+}
+
+.navbar-username:hover {
+  color: #0056b3;
+}
+

@@ -1,12 +1,13 @@
 // src/components/Navbar.js
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import logo from "../assets/logo.png";
 
 function Navbar() {
   const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -28,13 +29,19 @@ function Navbar() {
     fetchUserData();
   }, []);
 
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
   return (
     <nav className="navbar">
       <Link to="/home">
         <img src={logo} alt="Logo" className="navbar-logo" />
       </Link>
       <div className="navbar-user">
-        <span>{username}</span>
+        <span onClick={handleProfileClick} className="navbar-username">
+          {username}
+        </span>
       </div>
     </nav>
   );
