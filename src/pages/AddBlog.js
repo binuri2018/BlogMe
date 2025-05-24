@@ -39,12 +39,19 @@ function AddBlog() {
     e.preventDefault();
 
     try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in to create a blog");
+        return;
+      }
+
       await addDoc(collection(db, "blogs"), {
         title,
         content,
         backgroundImage,
         blogImage,
         authorName,
+        userId: user.uid,
         createdAt: serverTimestamp(),
       });
       alert("Blog added successfully!");
