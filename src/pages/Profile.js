@@ -20,6 +20,7 @@ function Profile() {
     backgroundImage: "",
     blogImage: "",
   });
+  const [activeTab, setActiveTab] = useState('profile'); // 'profile' or 'blogs'
   const navigate = useNavigate();
 
   // Fetch profile data
@@ -147,107 +148,191 @@ function Profile() {
   };
 
   return (
-    <div className="profile-container">
-      <div className="profile-section">
-        <h2>My Profile</h2>
-        {editing ? (
-          <div className="profile-edit-form">
-            <input
-              type="text"
-              name="firstName"
-              value={profileData.firstName}
-              onChange={handleChange}
-              placeholder="First Name"
-            />
-            <input
-              type="text"
-              name="lastName"
-              value={profileData.lastName}
-              onChange={handleChange}
-              placeholder="Last Name"
-            />
-            <input
-              type="email"
-              name="email"
-              value={profileData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              disabled
-            />
-            <input
-              type="text"
-              name="languages"
-              value={profileData.languages}
-              onChange={handleChange}
-              placeholder="Languages"
-            />
-            <div className="button-group">
-              <button onClick={handleSave} className="save-btn">Save</button>
-              <button onClick={() => setEditing(false)} className="cancel-btn">Cancel</button>
+    <div className="profile-page">
+      <div className="profile-header">
+        <div className="profile-avatar">
+          {profileData.firstName && profileData.lastName && (
+            <div className="avatar-text">
+              {profileData.firstName[0]}{profileData.lastName[0]}
             </div>
-          </div>
-        ) : (
-          <div className="profile-info">
-            <p><strong>First Name:</strong> {profileData.firstName}</p>
-            <p><strong>Last Name:</strong> {profileData.lastName}</p>
-            <p><strong>Email:</strong> {profileData.email}</p>
-            <p><strong>Languages:</strong> {profileData.languages}</p>
-            <button onClick={() => setEditing(true)} className="edit-btn">Edit Profile</button>
-          </div>
-        )}
+          )}
+        </div>
+        <div className="profile-welcome">
+          <h1>Welcome, {profileData.firstName}!</h1>
+          <p className="profile-subtitle">Manage your profile and blogs</p>
+        </div>
+      </div>
 
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
+      <div className="profile-tabs">
+        <button 
+          className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        >
+          Profile Information
         </button>
-
-        <button onClick={goToAddBlog} className="add-blog-btn">
-          Add a Blog
+        <button 
+          className={`tab-button ${activeTab === 'blogs' ? 'active' : ''}`}
+          onClick={() => setActiveTab('blogs')}
+        >
+          My Blogs
         </button>
       </div>
 
-      <div className="blogs-section">
-        <h3>My Blogs</h3>
-        {blogs.length === 0 ? (
-          <p className="no-blogs">You have no blogs yet. Start writing!</p>
-        ) : (
-          <div className="blogs-grid">
-            {blogs.map((blog) => (
-              <div key={blog.id} className="blog-card">
-                {blog.backgroundImage && (
-                  <div 
-                    className="blog-background" 
-                    style={{ backgroundImage: `url(${blog.backgroundImage})` }}
+      <div className="profile-content">
+        {activeTab === 'profile' ? (
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>Profile Information</h2>
+              {!editing && (
+                <button onClick={() => setEditing(true)} className="edit-btn">
+                  Edit Profile
+                </button>
+              )}
+            </div>
+
+            {editing ? (
+              <div className="profile-edit-form">
+                <div className="form-group">
+                  <label htmlFor="firstName">First Name</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={profileData.firstName}
+                    onChange={handleChange}
+                    placeholder="First Name"
                   />
-                )}
-                <div className="blog-content">
-                  <h4>{blog.title}</h4>
-                  <p>{blog.content.substring(0, 150)}...</p>
-                  {blog.blogImage && (
-                    <img 
-                      src={blog.blogImage} 
-                      alt={blog.title} 
-                      className="blog-thumbnail"
-                    />
-                  )}
-                  <div className="blog-actions">
-                    <button 
-                      onClick={() => handleEditBlog(blog)} 
-                      className="edit-btn"
-                      type="button"
-                    >
-                      Edit Blog
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteBlog(blog.id)} 
-                      className="delete-btn"
-                      type="button"
-                    >
-                      Delete Blog
-                    </button>
-                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lastName">Last Name</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={profileData.lastName}
+                    onChange={handleChange}
+                    placeholder="Last Name"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={profileData.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    disabled
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="languages">Languages</label>
+                  <input
+                    type="text"
+                    id="languages"
+                    name="languages"
+                    value={profileData.languages}
+                    onChange={handleChange}
+                    placeholder="Languages (e.g., English, Spanish)"
+                  />
+                </div>
+                <div className="button-group">
+                  <button onClick={handleSave} className="save-btn">Save Changes</button>
+                  <button onClick={() => setEditing(false)} className="cancel-btn">Cancel</button>
                 </div>
               </div>
-            ))}
+            ) : (
+              <div className="profile-info">
+                <div className="info-group">
+                  <label>First Name</label>
+                  <p>{profileData.firstName}</p>
+                </div>
+                <div className="info-group">
+                  <label>Last Name</label>
+                  <p>{profileData.lastName}</p>
+                </div>
+                <div className="info-group">
+                  <label>Email</label>
+                  <p>{profileData.email}</p>
+                </div>
+                <div className="info-group">
+                  <label>Languages</label>
+                  <p>{profileData.languages}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="profile-actions">
+              <button onClick={goToAddBlog} className="add-blog-btn">
+                <i className="fas fa-plus"></i> Create New Blog
+              </button>
+              <button onClick={handleLogout} className="logout-btn">
+                <i className="fas fa-sign-out-alt"></i> Logout
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="blogs-section">
+            <div className="section-header">
+              <h2>My Blogs</h2>
+              <button onClick={goToAddBlog} className="add-blog-btn">
+                <i className="fas fa-plus"></i> New Blog
+              </button>
+            </div>
+
+            {blogs.length === 0 ? (
+              <div className="no-blogs">
+                <div className="no-blogs-icon">
+                  <i className="fas fa-pen-fancy"></i>
+                </div>
+                <h3>No Blogs Yet</h3>
+                <p>Start sharing your thoughts with the world!</p>
+                <button onClick={goToAddBlog} className="create-blog-btn">
+                  Create Your First Blog
+                </button>
+              </div>
+            ) : (
+              <div className="blogs-grid">
+                {blogs.map((blog) => (
+                  <div key={blog.id} className="blog-card">
+                    {blog.backgroundImage && (
+                      <div 
+                        className="blog-background" 
+                        style={{ backgroundImage: `url(${blog.backgroundImage})` }}
+                      />
+                    )}
+                    <div className="blog-content">
+                      <h4>{blog.title}</h4>
+                      <p>{blog.content.substring(0, 150)}...</p>
+                      {blog.blogImage && (
+                        <img 
+                          src={blog.blogImage} 
+                          alt={blog.title} 
+                          className="blog-thumbnail"
+                        />
+                      )}
+                      <div className="blog-actions">
+                        <button 
+                          onClick={() => handleEditBlog(blog)} 
+                          className="edit-btn"
+                          type="button"
+                        >
+                          <i className="fas fa-edit"></i> Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteBlog(blog.id)} 
+                          className="delete-btn"
+                          type="button"
+                        >
+                          <i className="fas fa-trash"></i> Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -255,7 +340,15 @@ function Profile() {
       {editingBlog && (
         <div className="edit-blog-modal">
           <div className="edit-blog-form">
-            <h3>Edit Blog</h3>
+            <div className="modal-header">
+              <h3>Edit Blog</h3>
+              <button 
+                onClick={() => setEditingBlog(null)} 
+                className="close-btn"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
             <div className="form-group">
               <label htmlFor="title">Title</label>
               <input
@@ -305,8 +398,12 @@ function Profile() {
               />
             </div>
             <div className="button-group">
-              <button onClick={handleSaveBlog} className="save-btn">Save Changes</button>
-              <button onClick={() => setEditingBlog(null)} className="cancel-btn">Cancel</button>
+              <button onClick={handleSaveBlog} className="save-btn">
+                <i className="fas fa-save"></i> Save Changes
+              </button>
+              <button onClick={() => setEditingBlog(null)} className="cancel-btn">
+                <i className="fas fa-times"></i> Cancel
+              </button>
             </div>
           </div>
         </div>
