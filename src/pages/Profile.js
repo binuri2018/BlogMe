@@ -392,61 +392,52 @@ function Profile() {
               <div className="blogs-grid">
                 {blogs.map((blog) => (
                   <div key={blog.id} className="blog-card">
-                    <div className="blog-card-inner">
-                      <div className="blog-card-front">
-                        {blog.blogImage ? (
-                          <div className="blog-image-wrapper">
-                            <img 
-                              src={blog.blogImage} 
-                              alt={blog.title} 
-                              className="blog-image"
-                            />
-                            <div className="blog-overlay">
-                              <div className="blog-title">
-                                <h4>{blog.title}</h4>
-                                <div className="blog-author">
-                                  <i className="fas fa-user"></i>
-                                  <span>{profileData.firstName} {profileData.lastName}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="blog-image-wrapper no-image">
-                            <div className="blog-title">
-                              <h4>{blog.title}</h4>
-                              <div className="blog-author">
-                                <i className="fas fa-user"></i>
-                                <span>{profileData.firstName} {profileData.lastName}</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                    {blog.backgroundImage && (
+                      <div 
+                        className="blog-background" 
+                        style={{ backgroundImage: `url(${blog.backgroundImage})` }}
+                      >
+                        <div className="blog-overlay"></div>
                       </div>
-                      <div className="blog-card-back">
-                        <div className="blog-content">
+                    )}
+                    <div className="blog-content">
+                      {blog.blogImage && (
+                        <div className="blog-thumbnail-wrapper">
+                          <img 
+                            src={blog.blogImage} 
+                            alt={blog.title} 
+                            className="blog-thumbnail"
+                          />
+                        </div>
+                      )}
+                      <div className="blog-header">
+                        <h4>{blog.title}</h4>
+                        <div className="blog-meta">
+                          <span className="blog-author">
+                            <i className="fas fa-user"></i> {profileData.firstName} {profileData.lastName}
+                          </span>
                           <div className="blog-date">
                             <i className="far fa-calendar-alt"></i>
                             {formatDate(blog.createdAt)}
                           </div>
-                          <div className="blog-excerpt">
-                            {blog.content}
-                          </div>
-                          <div className="blog-actions">
-                            <button 
-                              onClick={() => handleEditBlog(blog)} 
-                              className="edit-btn"
-                            >
-                              <i className="fas fa-edit"></i> Edit
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteBlog(blog.id)} 
-                              className="delete-btn"
-                            >
-                              <i className="fas fa-trash-alt"></i> Delete
-                            </button>
-                          </div>
                         </div>
+                      </div>
+                      <div className="blog-body">
+                        <p className="blog-excerpt">{blog.content}</p>
+                      </div>
+                      <div className="blog-actions">
+                        <button 
+                          onClick={() => handleEditBlog(blog)} 
+                          className="edit-btn"
+                        >
+                          <i className="fas fa-edit"></i> Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteBlog(blog.id)} 
+                          className="delete-btn"
+                        >
+                          <i className="fas fa-trash-alt"></i> Delete
+                        </button>
                       </div>
                     </div>
                   </div>
