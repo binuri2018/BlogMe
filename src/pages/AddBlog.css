@@ -1,16 +1,16 @@
-/* src/styles/AddBlog.css */
+
 .add-blog-container {
   max-width: 600px;
   margin: 2rem auto;
   padding: 2rem;
   border-radius: 10px;
-  background-color: #ffffff; /* Light background */
+  background-color: #ffffff; 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .add-blog-container h2 {
   font-size: 1.8rem;
-  color: #333; /* Darker heading for contrast */
+  color: #333; 
   margin-bottom: 1rem;
 }
 
@@ -26,18 +26,18 @@
   padding: 0.8rem;
   border: 1px solid #ddd;
   border-radius: 5px;
-  color: #555; /* Light-themed text */
-  background-color: #f9f9f9; /* Soft background */
+  color: #555; 
+  background-color: #f9f9f9; 
 }
 
 .add-blog-container input::placeholder,
 .add-blog-container textarea::placeholder {
-  color: #999; /* Soft placeholder color */
+  color: #999; 
 }
 
 .add-blog-container button {
   background-color: #121795;
-  color: #fff; /* Light button text */
+  color: #fff; 
   padding: 0.8rem;
   border: none;
   border-radius: 5px;
