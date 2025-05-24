@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
+import "./AddBlog.css";
 
 function AddBlog() {
   const [title, setTitle] = useState("");
@@ -13,11 +14,25 @@ function AddBlog() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      const { displayName } = user;
-      setAuthorName(displayName);
-    }
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const { firstName, lastName } = docSnap.data();
+            setAuthorName(`${firstName} ${lastName}`);
+          } else {
+            console.log("No user data found.");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error.message);
+        }
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleSubmit = async (e) => {
