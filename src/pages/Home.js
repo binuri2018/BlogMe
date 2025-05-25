@@ -1,17 +1,12 @@
 // src/pages/Home.js
 
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { auth, db } from '../firebase';
+import { collection, getDocs, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import AuthorProfileModal from '../components/AuthorProfileModal';
-
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
-import "./Home.css";
 
 function Home() {
   const [blogs, setBlogs] = useState([]);
@@ -88,9 +83,8 @@ function Home() {
             <p>Be the first to share your story!</p>
           </div>
         ) : (
-
           <div className="featured-grid">
-            {featuredBlogs.map((blog) => (
+            {blogs.slice(0, 3).map((blog) => (
               <Link to={`/blog/${blog.id}`} key={blog.id} className="featured-card">
                 {blog.blogImage && (
                   <div className="featured-image">
@@ -112,55 +106,58 @@ function Home() {
                       <i className="fas fa-user"></i> {blog.authorName}
                     </span>
                     <span className="date">
-                      <i className="far fa-calendar-alt"></i> {new Date(blog.createdAt?.toDate()).toLocaleDateString()}
+                      <i className="far fa-calendar-alt"></i> {formatDate(blog.createdAt)}
                     </span>
-
-          <div className="blog-feed">
-            {blogs.map((blog) => (
-              <article 
-                key={blog.id} 
-                className="blog-card"
-                style={{ backgroundImage: `url(${blog.backgroundImage})` }}
-              >
-                <div className="blog-overlay"></div>
-                <div className="blog-card-content">
-                  <div className="blog-text-content">
-                    <div className="blog-header">
-                      <h2>{blog.title}</h2>
-                      <div className="blog-meta">
-                        <span className="author">
-                          <i className="fas fa-user"></i> {blog.authorName}
-                        </span>
-                        {blog.createdAt && (
-                          <span className="date">
-                            <i className="fas fa-calendar"></i> {formatDate(blog.createdAt)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="blog-content">
-                      <p>{blog.content}</p>
-                    </div>
-
                   </div>
-
-                  {blog.blogImage && (
-                    <div className="blog-image-container">
-                      <img 
-                        src={blog.blogImage} 
-                        alt={blog.title} 
-                        className="blog-image"
-                      />
-                    </div>
-                  )}
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}
 
-      </section>
+        <div className="blog-feed">
+          {blogs.map((blog) => (
+            <article 
+              key={blog.id} 
+              className="blog-card"
+              style={{ backgroundImage: `url(${blog.backgroundImage})` }}
+            >
+              <div className="blog-overlay"></div>
+              <div className="blog-card-content">
+                <div className="blog-text-content">
+                  <div className="blog-header">
+                    <h2>{blog.title}</h2>
+                    <div className="blog-meta">
+                      <span className="author">
+                        <i className="fas fa-user"></i> {blog.authorName}
+                      </span>
+                      {blog.createdAt && (
+                        <span className="date">
+                          <i className="fas fa-calendar"></i> {formatDate(blog.createdAt)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="blog-content">
+                    <p>{blog.content}</p>
+                  </div>
+                </div>
+
+                {blog.blogImage && (
+                  <div className="blog-image-container">
+                    <img 
+                      src={blog.blogImage} 
+                      alt={blog.title} 
+                      className="blog-image"
+                    />
+                  </div>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </main>
 
       {/* Categories Section */}
       <section className="categories-section">
@@ -203,7 +200,6 @@ function Home() {
         />
       )}
 
-      </main>
     </div>
   );
 }

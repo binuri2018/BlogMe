@@ -30,7 +30,6 @@ function Profile() {
     totalViews: 0,
     lastActive: null
   });
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile' or 'blogs'
   const navigate = useNavigate();
 
   // Format date helper
@@ -252,50 +251,6 @@ function Profile() {
 
             {editing ? (
               <form className="profile-edit-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-
-        <div className="profile-avatar">
-          {profileData.firstName && profileData.lastName && (
-            <div className="avatar-text">
-              {profileData.firstName[0]}{profileData.lastName[0]}
-            </div>
-          )}
-        </div>
-        <div className="profile-welcome">
-          <h1>Welcome, {profileData.firstName}!</h1>
-          <p className="profile-subtitle">Manage your profile and blogs</p>
-        </div>
-      </div>
-
-      <div className="profile-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
-        >
-          Profile Information
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'blogs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('blogs')}
-        >
-          My Blogs
-        </button>
-      </div>
-
-      <div className="profile-content">
-        {activeTab === 'profile' ? (
-          <div className="profile-section">
-            <div className="section-header">
-              <h2>Profile Information</h2>
-              {!editing && (
-                <button onClick={() => setEditing(true)} className="edit-btn">
-                  Edit Profile
-                </button>
-              )}
-            </div>
-
-            {editing ? (
-              <div className="profile-edit-form">
-
                 <div className="form-group">
                   <label htmlFor="firstName">First Name</label>
                   <input
@@ -305,7 +260,6 @@ function Profile() {
                     value={profileData.firstName}
                     onChange={handleChange}
                     placeholder="First Name"
-
                     required
                   />
                 </div>
@@ -409,78 +363,9 @@ function Profile() {
                   <button onClick={goToAddBlog} className="add-blog-btn">
                     <i className="fas fa-plus"></i> Add New Blog
                   </button>
-
-                  />
-
-                </div>
-                <div className="form-group">
-                  <label htmlFor="lastName">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={profileData.lastName}
-                    onChange={handleChange}
-                    placeholder="Last Name"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={profileData.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    disabled
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="languages">Languages</label>
-                  <input
-                    type="text"
-                    id="languages"
-                    name="languages"
-                    value={profileData.languages}
-                    onChange={handleChange}
-                    placeholder="Languages (e.g., English, Spanish)"
-                  />
-                </div>
-                <div className="button-group">
-                  <button onClick={handleSave} className="save-btn">Save Changes</button>
-                  <button onClick={() => setEditing(false)} className="cancel-btn">Cancel</button>
-                </div>
-              </div>
-            ) : (
-              <div className="profile-info">
-                <div className="info-group">
-                  <label>First Name</label>
-                  <p>{profileData.firstName}</p>
-                </div>
-                <div className="info-group">
-                  <label>Last Name</label>
-                  <p>{profileData.lastName}</p>
-                </div>
-                <div className="info-group">
-                  <label>Email</label>
-                  <p>{profileData.email}</p>
-                </div>
-                <div className="info-group">
-                  <label>Languages</label>
-                  <p>{profileData.languages}</p>
                 </div>
               </div>
             )}
-
-            <div className="profile-actions">
-              <button onClick={goToAddBlog} className="add-blog-btn">
-                <i className="fas fa-plus"></i> Create New Blog
-              </button>
-              <button onClick={handleLogout} className="logout-btn">
-                <i className="fas fa-sign-out-alt"></i> Logout
-              </button>
-            </div>
           </div>
         ) : (
           <div className="blogs-section">
@@ -536,87 +421,6 @@ function Profile() {
                           type="button"
                         >
                           <i className="fas fa-trash"></i> Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-          </div>
-        ) : (
-          <div className="blogs-section">
-            <div className="section-header">
-              <h2><i className="fas fa-blog"></i> My Blogs</h2>
-              <button onClick={goToAddBlog} className="add-blog-btn">
-                <i className="fas fa-plus"></i> Add New Blog
-              </button>
-            </div>
-
-            {loading ? (
-              <div className="loading-spinner">
-                <i className="fas fa-spinner fa-spin"></i>
-                <p>Loading your blogs...</p>
-              </div>
-            ) : blogs.length === 0 ? (
-              <div className="no-blogs">
-                <i className="fas fa-pen-fancy"></i>
-                <h3>No Blogs Yet</h3>
-                <p>Start sharing your thoughts with the world!</p>
-                <button onClick={goToAddBlog} className="add-blog-btn">
-                  <i className="fas fa-plus"></i> Create Your First Blog
-                </button>
-              </div>
-            ) : (
-              <div className="blogs-grid">
-                {blogs.map((blog) => (
-                  <div key={blog.id} className="blog-card">
-                    {blog.backgroundImage && (
-                      <div 
-                        className="blog-background" 
-                        style={{ backgroundImage: `url(${blog.backgroundImage})` }}
-                      >
-                        <div className="blog-overlay"></div>
-                      </div>
-                    )}
-                    <div className="blog-content">
-                      {blog.blogImage && (
-                        <div className="blog-thumbnail-wrapper">
-                          <img 
-                            src={blog.blogImage} 
-                            alt={blog.title} 
-                            className="blog-thumbnail"
-                          />
-                        </div>
-                      )}
-                      <div className="blog-header">
-                        <h4>{blog.title}</h4>
-                        <div className="blog-meta">
-                          <span className="blog-author">
-                            <i className="fas fa-user"></i> {profileData.firstName} {profileData.lastName}
-                          </span>
-                          <div className="blog-date">
-                            <i className="far fa-calendar-alt"></i>
-                            {formatDate(blog.createdAt)}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="blog-body">
-                        <p className="blog-excerpt">{blog.content}</p>
-                      </div>
-                      <div className="blog-actions">
-                        <button 
-                          onClick={() => handleEditBlog(blog)} 
-                          className="edit-btn"
-                        >
-                          <i className="fas fa-edit"></i> Edit
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteBlog(blog.id)} 
-                          className="delete-btn"
-                        >
-                          <i className="fas fa-trash-alt"></i> Delete
                         </button>
                       </div>
                     </div>
@@ -701,63 +505,8 @@ function Profile() {
               </button>
               <button onClick={() => setEditingBlog(null)} className="cancel-btn">
                 <i className="fas fa-times"></i> Cancel
-         </div>
-            <form onSubmit={(e) => { e.preventDefault(); handleSaveBlog(); }}>
-              <div className="form-group">
-                <label htmlFor="title">Title</label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={blogFormData.title}
-                  onChange={handleBlogChange}
-                  placeholder="Blog Title"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="content">Content</label>
-                <textarea
-                  id="content"
-                  name="content"
-                  value={blogFormData.content}
-                  onChange={handleBlogChange}
-                  placeholder="Blog Content"
-                  rows="6"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="backgroundImage">Background Image URL</label>
-                <input
-                  type="text"
-                  id="backgroundImage"
-                  name="backgroundImage"
-                  value={blogFormData.backgroundImage}
-                  onChange={handleBlogChange}
-                  placeholder="Background Image URL"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="blogImage">Blog Image URL</label>
-                <input
-                  type="text"
-                  id="blogImage"
-                  name="blogImage"
-                  value={blogFormData.blogImage}
-                  onChange={handleBlogChange}
-                  placeholder="Blog Image URL"
-                />
-              </div>
-              <div className="button-group">
-                <button type="submit" className="save-btn">
-                  <i className="fas fa-save"></i> Save Changes
-                </button>
-                <button type="button" onClick={() => setEditingBlog(null)} className="cancel-btn">
-                  <i className="fas fa-times"></i> Cancel
-                </button>
-              </div>
-            </form>
+              </button>
+            </div>
           </div>
         </div>
       )}

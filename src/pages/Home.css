@@ -292,9 +292,6 @@
   .blog-image {
     max-height: 250px;
   }
-}
-
-
 
   .category-filter-btn {
     width: 100%;
@@ -317,6 +314,6 @@
 
 .author.clickable:hover i {
   transform: scale(1.1);
-} 
+}
 
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'); 
