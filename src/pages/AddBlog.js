@@ -8,10 +8,23 @@ import "./AddBlog.css";
 function AddBlog() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [backgroundImage, setBackgroundImage] = useState("");
   const [blogImage, setBlogImage] = useState("");
+  const [category, setCategory] = useState("");
   const [authorName, setAuthorName] = useState("");
   const navigate = useNavigate();
+
+  const categories = [
+    { value: "technology", label: "Technology" },
+    { value: "food", label: "Food & Cooking" },
+    { value: "travel", label: "Travel" },
+    { value: "lifestyle", label: "Lifestyle" },
+    { value: "health", label: "Health & Wellness" },
+    { value: "education", label: "Education" },
+    { value: "business", label: "Business" },
+    { value: "entertainment", label: "Entertainment" },
+    { value: "sports", label: "Sports" },
+    { value: "other", label: "Other" }
+  ];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -48,11 +61,14 @@ function AddBlog() {
       await addDoc(collection(db, "blogs"), {
         title,
         content,
-        backgroundImage,
         blogImage,
+        category,
         authorName,
         userId: user.uid,
         createdAt: serverTimestamp(),
+        views: 0,
+        likes: 0,
+        comments: []
       });
       alert("Blog added successfully!");
       navigate("/home");
@@ -66,34 +82,63 @@ function AddBlog() {
     <div className="add-blog-container">
       <h2>Add New Blog</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Blog Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Blog Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Background Image URL"
-          value={backgroundImage}
-          onChange={(e) => setBackgroundImage(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Blog Image URL"
-          value={blogImage}
-          onChange={(e) => setBlogImage(e.target.value)}
-          required
-        />
-        <button type="submit">Add Blog</button>
+        <div className="form-group">
+          <label htmlFor="title">Blog Title</label>
+          <input
+            type="text"
+            id="title"
+            placeholder="Enter your blog title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="category">Category</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
+            <option value="">Select a category</option>
+            {categories.map((cat) => (
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="content">Blog Content</label>
+          <textarea
+            id="content"
+            placeholder="Write your blog content here..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
+            rows="10"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="blogImage">Blog Image URL</label>
+          <input
+            type="url"
+            id="blogImage"
+            placeholder="Enter the URL of your blog image"
+            value={blogImage}
+            onChange={(e) => setBlogImage(e.target.value)}
+            required
+          />
+          <small className="form-help">Enter a valid image URL (e.g., https://example.com/image.jpg)</small>
+        </div>
+
+        <button type="submit" className="submit-button">
+          <i className="fas fa-paper-plane"></i> Publish Blog
+        </button>
       </form>
     </div>
   );
