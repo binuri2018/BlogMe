@@ -8,18 +8,39 @@ import './Home.css';
 function Home() {
   const [featuredBlogs, setFeaturedBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const categories = [
+    { value: 'all', label: 'All Blogs', icon: 'fas fa-th-large' },
+    { value: 'personal', label: 'Personal Blog', icon: 'fas fa-pen-fancy' },
+    { value: 'tech', label: 'Tech Blog', icon: 'fas fa-laptop-code' },
+    { value: 'food', label: 'Food Blog', icon: 'fas fa-utensils' },
+    { value: 'photo', label: 'Photo Blog', icon: 'fas fa-camera' },
+    { value: 'book', label: 'Book Reviews', icon: 'fas fa-book' },
+    { value: 'travel', label: 'Travel Blog', icon: 'fas fa-plane' }
+  ];
 
   useEffect(() => {
     const fetchFeaturedBlogs = async () => {
       try {
         const blogsRef = collection(db, "blogs");
-        const q = query(blogsRef, orderBy("createdAt", "desc"), limit(6));
+        const q = query(
+          blogsRef, 
+          orderBy("createdAt", "desc"), 
+          limit(selectedCategory === 'all' ? 12 : 6)
+        );
         const querySnapshot = await getDocs(q);
         const blogs = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        setFeaturedBlogs(blogs);
+        
+        // Filter blogs by category if not 'all'
+        const filteredBlogs = selectedCategory === 'all' 
+          ? blogs 
+          : blogs.filter(blog => blog.category === selectedCategory);
+        
+        setFeaturedBlogs(filteredBlogs);
       } catch (error) {
         console.error("Error fetching blogs:", error);
       } finally {
@@ -28,16 +49,7 @@ function Home() {
     };
 
     fetchFeaturedBlogs();
-  }, []);
-
-  const categories = [
-    { icon: 'fas fa-pen-fancy', title: 'Personal Blog', description: 'Share your thoughts and experiences' },
-    { icon: 'fas fa-laptop-code', title: 'Tech Blog', description: 'Write about technology and innovation' },
-    { icon: 'fas fa-utensils', title: 'Food Blog', description: 'Share your culinary adventures' },
-    { icon: 'fas fa-camera', title: 'Photo Blog', description: 'Showcase your photography' },
-    { icon: 'fas fa-book', title: 'Book Reviews', description: 'Share your literary insights' },
-    { icon: 'fas fa-plane', title: 'Travel Blog', description: 'Document your journeys' }
-  ];
+  }, [selectedCategory]);
 
   return (
     <div className="home-page">
@@ -59,11 +71,34 @@ function Home() {
           <h2>Featured Blogs</h2>
           <p>Discover stories, thinking, and expertise from writers on any topic.</p>
         </div>
+
+        {/* Category Filter */}
+        <div className="category-filter">
+          {categories.map((category) => (
+            <button
+              key={category.value}
+              className={`category-filter-btn ${selectedCategory === category.value ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(category.value)}
+            >
+              <i className={category.icon}></i>
+              <span>{category.label}</span>
+            </button>
+          ))}
+        </div>
         
         {loading ? (
           <div className="loading-spinner">
             <i className="fas fa-spinner fa-spin"></i>
             <p>Loading featured blogs...</p>
+          </div>
+        ) : featuredBlogs.length === 0 ? (
+          <div className="no-blogs">
+            <i className="fas fa-pen-fancy"></i>
+            <h3>No Blogs Found</h3>
+            <p>No blogs available in this category yet.</p>
+            <Link to="/add-blog" className="cta-button">
+              Be the first to write
+            </Link>
           </div>
         ) : (
           <div className="featured-grid">
@@ -75,6 +110,10 @@ function Home() {
                   </div>
                 )}
                 <div className="featured-content">
+                  <div className="blog-category">
+                    <i className={categories.find(cat => cat.value === blog.category)?.icon}></i>
+                    {categories.find(cat => cat.value === blog.category)?.label}
+                  </div>
                   <h3>{blog.title}</h3>
                   <p className="featured-excerpt">{blog.content.substring(0, 150)}...</p>
                   <div className="featured-meta">
@@ -104,7 +143,7 @@ function Home() {
               <div className="category-icon">
                 <i className={category.icon}></i>
               </div>
-              <h3>{category.title}</h3>
+              <h3>{category.label}</h3>
               <p>{category.description}</p>
               <Link to="/add-blog" className="category-link">
                 Start writing <i className="fas fa-arrow-right"></i>
