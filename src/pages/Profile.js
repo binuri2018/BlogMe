@@ -581,26 +581,24 @@ function Profile() {
                       </div>
                     )}
                     <div className="blog-content">
-                      <div className="blog-content-wrapper">
-                        {blog.blogImage && (
-                          <div className="blog-thumbnail-wrapper">
-                            <img 
-                              src={blog.blogImage} 
-                              alt={blog.title} 
-                              className="blog-thumbnail"
-                            />
-                          </div>
-                        )}
-                        <div className="blog-header">
-                          <h4>{blog.title}</h4>
-                          <div className="blog-meta">
-                            <span className="blog-author">
-                              <i className="fas fa-user"></i> {profileData.firstName} {profileData.lastName}
-                            </span>
-                            <div className="blog-date">
-                              <i className="far fa-calendar-alt"></i>
-                              {formatDate(blog.createdAt)}
-                            </div>
+                      {blog.blogImage && (
+                        <div className="blog-thumbnail-wrapper">
+                          <img 
+                            src={blog.blogImage} 
+                            alt={blog.title} 
+                            className="blog-thumbnail"
+                          />
+                        </div>
+                      )}
+                      <div className="blog-header">
+                        <h4>{blog.title}</h4>
+                        <div className="blog-meta">
+                          <span className="blog-author">
+                            <i className="fas fa-user"></i> {profileData.firstName} {profileData.lastName}
+                          </span>
+                          <div className="blog-date">
+                            <i className="far fa-calendar-alt"></i>
+                            {formatDate(blog.createdAt)}
                           </div>
                         </div>
                       </div>
