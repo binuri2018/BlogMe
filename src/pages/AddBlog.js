@@ -6,10 +6,23 @@ import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/fires
 import "./AddBlog.css";
 
 function AddBlog() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [backgroundImage, setBackgroundImage] = useState("");
-  const [blogImage, setBlogImage] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    backgroundImage: "",
+    blogImage: "",
+    category: ""
+  });
+
+  const categories = [
+    { value: "personal", label: "Personal Blog", icon: "fas fa-pen-fancy" },
+    { value: "tech", label: "Tech Blog", icon: "fas fa-laptop-code" },
+    { value: "food", label: "Food Blog", icon: "fas fa-utensils" },
+    { value: "photo", label: "Photo Blog", icon: "fas fa-camera" },
+    { value: "book", label: "Book Reviews", icon: "fas fa-book" },
+    { value: "travel", label: "Travel Blog", icon: "fas fa-plane" }
+  ];
+
   const [authorName, setAuthorName] = useState("");
   const navigate = useNavigate();
 
@@ -35,66 +48,96 @@ function AddBlog() {
     fetchUserData();
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const user = auth.currentUser;
       if (!user) {
-        alert("You must be logged in to create a blog");
+        navigate("/login");
         return;
       }
 
-      await addDoc(collection(db, "blogs"), {
-        title,
-        content,
-        backgroundImage,
-        blogImage,
-        authorName,
+      const blogData = {
+        ...formData,
         userId: user.uid,
+        authorName: user.displayName || "Anonymous",
         createdAt: serverTimestamp(),
-      });
-      alert("Blog added successfully!");
-      navigate("/home");
+        category: formData.category || "personal"
+      };
+
+      await addDoc(collection(db, "blogs"), blogData);
+      navigate("/profile");
     } catch (error) {
-      console.error("Error adding blog:", error.message);
-      alert("Failed to add blog. Please try again.");
+      console.error("Error adding blog:", error);
+      alert("Error adding blog. Please try again.");
     }
   };
 
   return (
-    <div className="add-blog-container">
-      <h2>Add New Blog</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Blog Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <textarea
-          placeholder="Blog Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Background Image URL"
-          value={backgroundImage}
-          onChange={(e) => setBackgroundImage(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Blog Image URL"
-          value={blogImage}
-          onChange={(e) => setBlogImage(e.target.value)}
-          required
-        />
-        <button type="submit">Add Blog</button>
-      </form>
+    <div className="add-blog-page">
+      <div className="add-blog-container">
+        <h1>Create New Blog</h1>
+        <form onSubmit={handleSubmit} className="blog-form">
+          <input
+            type="text"
+            placeholder="Blog Title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+          <textarea
+            placeholder="Blog Content"
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Background Image URL"
+            name="backgroundImage"
+            value={formData.backgroundImage}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Blog Image URL"
+            name="blogImage"
+            value={formData.blogImage}
+            onChange={handleChange}
+            required
+          />
+          <div className="form-group">
+            <label htmlFor="category">Category</label>
+            <div className="category-select">
+              {categories.map((cat) => (
+                <label key={cat.value} className={`category-option ${formData.category === cat.value ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="category"
+                    value={cat.value}
+                    checked={formData.category === cat.value}
+                    onChange={handleChange}
+                  />
+                  <i className={cat.icon}></i>
+                  <span>{cat.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <button type="submit">Add Blog</button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -295,4 +295,109 @@
 }
 
 
+/* Add Font Awesome icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+/* Category Filter */
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+}
+
+.category-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid #eee;
+  border-radius: 30px;
+  background: white;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-filter-btn:hover {
+  border-color: #4a90e2;
+  color: #4a90e2;
+  background: #f8f9fa;
+}
+
+.category-filter-btn.active {
+  background: #4a90e2;
+  border-color: #4a90e2;
+  color: white;
+}
+
+.category-filter-btn i {
+  font-size: 1.1rem;
+}
+
+/* Blog Category */
+.blog-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(74, 144, 226, 0.1);
+  border-radius: 20px;
+  color: #4a90e2;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.blog-category i {
+  font-size: 1rem;
+}
+
+/* No Blogs State */
+.no-blogs {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  margin: 2rem auto;
+  max-width: 500px;
+}
+
+.no-blogs i {
+  font-size: 3rem;
+  color: #4a90e2;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.no-blogs h3 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.no-blogs p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .category-filter {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .category-filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
+} 
+
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'); 
+
