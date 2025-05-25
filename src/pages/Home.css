@@ -435,4 +435,21 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+.author.clickable {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.author.clickable:hover {
+  color: #4a90e2;
+}
+
+.author.clickable i {
+  transition: transform 0.3s ease;
+}
+
+.author.clickable:hover i {
+  transform: scale(1.1);
 } 

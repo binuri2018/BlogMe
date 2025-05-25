@@ -4,11 +4,13 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Link } from 'react-router-dom';
 import './Home.css';
+import AuthorProfileModal from '../components/AuthorProfileModal';
 
 function Home() {
   const [featuredBlogs, setFeaturedBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedAuthorId, setSelectedAuthorId] = useState(null);
 
   const categories = [
     { value: 'all', label: 'All Blogs', icon: 'fas fa-th-large' },
@@ -50,6 +52,12 @@ function Home() {
 
     fetchFeaturedBlogs();
   }, [selectedCategory]);
+
+  const handleAuthorClick = (e, userId) => {
+    e.preventDefault(); // Prevent navigation to blog
+    e.stopPropagation(); // Prevent event bubbling
+    setSelectedAuthorId(userId);
+  };
 
   return (
     <div className="home-page">
@@ -117,7 +125,10 @@ function Home() {
                   <h3>{blog.title}</h3>
                   <p className="featured-excerpt">{blog.content.substring(0, 150)}...</p>
                   <div className="featured-meta">
-                    <span className="author">
+                    <span 
+                      className="author clickable"
+                      onClick={(e) => handleAuthorClick(e, blog.userId)}
+                    >
                       <i className="fas fa-user"></i> {blog.authorName}
                     </span>
                     <span className="date">
@@ -163,6 +174,14 @@ function Home() {
           </Link>
         </div>
       </section>
+
+      {/* Author Profile Modal */}
+      {selectedAuthorId && (
+        <AuthorProfileModal
+          authorId={selectedAuthorId}
+          onClose={() => setSelectedAuthorId(null)}
+        />
+      )}
     </div>
   );
 }
