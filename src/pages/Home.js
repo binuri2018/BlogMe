@@ -240,26 +240,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="categories-section">
-        <div className="section-header">
-          <h2>Popular Categories</h2>
-          <p>Explore blogs by category</p>
-        </div>
-        <div className="categories-grid">
-          {categories.map((category, index) => (
-            <div key={index} className="category-card">
-              <i className={`category-icon ${category.icon}`}></i>
-              <h3>{category.title}</h3>
-              <p>{category.description}</p>
-              <Link to={category.link} className="category-link">
-                Explore <i className="fas fa-arrow-right"></i>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Features Section */}
       <section className="features-section">
         <div className="section-header">
@@ -277,6 +257,64 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Footer Section */}
+      <footer className="home-footer">
+        <div className="footer-content">
+          <div className="footer-section about-us">
+            <h3>About Us</h3>
+            <p>Blog Me is a modern platform for writers and readers to share their stories, experiences, and knowledge. We believe in the power of storytelling and creating meaningful connections through written content.</p>
+            <div className="social-links">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-facebook"></i>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-twitter"></i>
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="footer-section contact">
+            <h3>Contact Us</h3>
+            <div className="contact-info">
+              <div className="contact-item">
+                <i className="fas fa-envelope"></i>
+                <span>support@blogme.com</span>
+              </div>
+              <div className="contact-item">
+                <i className="fas fa-phone"></i>
+                <span>+1 (555) 123-4567</span>
+              </div>
+              <div className="contact-item">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>123 Blog Street, Digital City, 12345</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-section quick-links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/add-blog">Write a Blog</Link></li>
+              <li><Link to="/profile">My Profile</Link></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+              <li><a href="/terms">Terms of Service</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <p>&copy; {new Date().getFullYear()} Blog Me. All rights reserved.</p>
+        </div>
+      </footer>
+
+      {/* Author Profile Modal */}
       {selectedAuthor && (
         <AuthorProfileModal
           author={selectedAuthor}

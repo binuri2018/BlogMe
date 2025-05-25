@@ -1,124 +1,87 @@
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import './AuthorProfileModal.css';
 
-function AuthorProfileModal({ authorId, onClose }) {
+function AuthorProfileModal({ author, onClose }) {
   const [authorData, setAuthorData] = useState(null);
-  const [blogCount, setBlogCount] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  // Helper function to format languages
-  const formatLanguages = (languages) => {
-    if (!languages) return [];
-    if (Array.isArray(languages)) return languages;
-    if (typeof languages === 'string') {
-      return languages.split(',').map(lang => lang.trim()).filter(lang => lang);
-    }
-    if (typeof languages === 'object') {
-      return Object.values(languages).filter(lang => lang);
-    }
-    return [];
-  };
 
   useEffect(() => {
     const fetchAuthorData = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, "users", authorId));
-        if (userDoc.exists()) {
-          setAuthorData(userDoc.data());
+      if (author?.uid) {
+        try {
+          const docRef = doc(db, "users", author.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setAuthorData(docSnap.data());
+          }
+        } catch (error) {
+          console.error("Error fetching author data:", error.message);
+        } finally {
+          setLoading(false);
         }
-
-        const blogsRef = collection(db, "blogs");
-        const q = query(blogsRef, where("userId", "==", authorId));
-        const querySnapshot = await getDocs(q);
-        setBlogCount(querySnapshot.size);
-      } catch (error) {
-        console.error("Error fetching author data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    if (authorId) {
-      fetchAuthorData();
-    }
-  }, [authorId]);
+    fetchAuthorData();
+  }, [author]);
 
-  if (!authorId) return null;
-
-  const languages = formatLanguages(authorData?.languages);
+  if (!author || !author.uid) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
-          <i className="fas fa-times"></i>
-        </button>
-        
+    <div className="author-modal-overlay" onClick={onClose}>
+      <div className="author-modal-content" onClick={e => e.stopPropagation()}>
+        <div className="author-modal-header">
+          <div className="author-avatar">
+            <span className="avatar-text">
+              {authorData ? `${authorData.firstName?.[0] || ''}${authorData.lastName?.[0] || ''}` : '?'}
+            </span>
+          </div>
+          <button onClick={onClose} className="close-button">
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+
         {loading ? (
-          <div className="modal-loading">
-            <i className="fas fa-spinner fa-spin"></i>
-            <p>Loading profile...</p>
+          <div className="author-modal-loading">
+            <div className="loading-spinner"></div>
+            <p>Loading author information...</p>
           </div>
         ) : authorData ? (
-          <div className="author-profile">
-            <div className="profile-main">
-              <div className="profile-avatar">
-                {authorData.profilePicture ? (
-                  <img src={authorData.profilePicture} alt={authorData.firstName} />
-                ) : (
-                  <i className="fas fa-user"></i>
-                )}
-              </div>
-              <div className="profile-info">
-                <h2>{authorData.firstName} {authorData.lastName}</h2>
-                <div className="profile-meta">
-                  {authorData.location && (
-                    <span className="meta-item">
-                      <i className="fas fa-map-marker-alt"></i>
-                      {authorData.location}
-                    </span>
-                  )}
-                  <span className="meta-item">
-                    <i className="fas fa-pen-fancy"></i>
-                    {blogCount} blogs
-                  </span>
-                </div>
-              </div>
+          <div className="author-modal-body">
+            <h3>{`${authorData.firstName || ''} ${authorData.lastName || ''}`}</h3>
+            
+            <div className="author-info-group">
+              <label><i className="fas fa-envelope"></i> Email</label>
+              <p>{authorData.email}</p>
             </div>
 
-            <div className="profile-details">
-              <div className="detail-item">
-                <i className="fas fa-envelope"></i>
-                <span>{authorData.email || "Not available"}</span>
+            {authorData.location && (
+              <div className="author-info-group">
+                <label><i className="fas fa-map-marker-alt"></i> Location</label>
+                <p>{authorData.location}</p>
               </div>
-              
-              <div className="detail-item languages">
-                <i className="fas fa-language"></i>
-                <div className="languages-list">
-                  {languages.length > 0 ? (
-                    languages.map((language, index) => (
-                      <span key={index} className="language-tag">{language}</span>
-                    ))
-                  ) : (
-                    <span className="no-languages">No languages specified</span>
-                  )}
-                </div>
-              </div>
+            )}
 
-              {authorData.bio && (
-                <div className="detail-item bio">
-                  <i className="fas fa-quote-left"></i>
-                  <p>{authorData.bio}</p>
-                </div>
-              )}
-            </div>
+            {authorData.languages && (
+              <div className="author-info-group">
+                <label><i className="fas fa-language"></i> Languages</label>
+                <p>{authorData.languages}</p>
+              </div>
+            )}
+
+            {authorData.bio && (
+              <div className="author-info-group">
+                <label><i className="fas fa-book"></i> Bio</label>
+                <p className="bio-text">{authorData.bio}</p>
+              </div>
+            )}
           </div>
         ) : (
-          <div className="modal-error">
+          <div className="author-modal-error">
             <i className="fas fa-exclamation-circle"></i>
-            <p>Could not load author profile</p>
+            <p>Could not load author information</p>
           </div>
         )}
       </div>

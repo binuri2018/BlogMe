@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
+import { Link } from "react-router-dom";
 import "./AddBlog.css";
 
 function AddBlog() {
@@ -79,67 +80,106 @@ function AddBlog() {
   };
 
   return (
-    <div className="add-blog-container">
-      <h2>Add New Blog</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="title">Blog Title</label>
-          <input
-            type="text"
-            id="title"
-            placeholder="Enter your blog title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
+    <div className="add-blog-page">
+      {/* Hero Section */}
+      <header className="add-blog-header">
+        <div className="header-content">
+          <h1>Share Your Story</h1>
+          <p className="header-subtitle">
+            Create a compelling blog post that resonates with your audience
+          </p>
         </div>
+      </header>
 
-        <div className="form-group">
-          <label htmlFor="category">Category</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          >
-            <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
+      {/* Form Section */}
+      <section className="add-blog-section">
+        <div className="add-blog-container">
+          <div className="form-header">
+            <h2><i className="fas fa-pen-fancy"></i> Create New Blog</h2>
+            <p>Fill in the details below to publish your blog</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="blog-form">
+            <div className="form-group">
+              <label htmlFor="title">
+                <i className="fas fa-heading"></i> Blog Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                placeholder="Enter a catchy title for your blog"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="category">
+                <i className="fas fa-tags"></i> Category
+              </label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              >
+                <option value="">Select a category</option>
+                {categories.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="content">
+                <i className="fas fa-align-left"></i> Blog Content
+              </label>
+              <textarea
+                id="content"
+                placeholder="Write your blog content here... (You can use multiple paragraphs)"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                rows="12"
+              />
+              <small className="form-help">
+                <i className="fas fa-info-circle"></i> 
+                Write engaging content that captures your readers' attention. Use paragraphs to organize your thoughts.
+              </small>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="blogImage">
+                <i className="fas fa-image"></i> Blog Image URL
+              </label>
+              <input
+                type="url"
+                id="blogImage"
+                placeholder="Enter the URL of your blog image (e.g., https://example.com/image.jpg)"
+                value={blogImage}
+                onChange={(e) => setBlogImage(e.target.value)}
+                required
+              />
+              <small className="form-help">
+                <i className="fas fa-info-circle"></i> 
+                Add a high-quality image that represents your blog post. Recommended size: 800x450 pixels.
+              </small>
+            </div>
+
+            <div className="form-actions">
+              <Link to="/home" className="cancel-button">
+                <i className="fas fa-times"></i> Cancel
+              </Link>
+              <button type="submit" className="submit-button">
+                <i className="fas fa-paper-plane"></i> Publish Blog
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div className="form-group">
-          <label htmlFor="content">Blog Content</label>
-          <textarea
-            id="content"
-            placeholder="Write your blog content here..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            rows="10"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="blogImage">Blog Image URL</label>
-          <input
-            type="url"
-            id="blogImage"
-            placeholder="Enter the URL of your blog image"
-            value={blogImage}
-            onChange={(e) => setBlogImage(e.target.value)}
-            required
-          />
-          <small className="form-help">Enter a valid image URL (e.g., https://example.com/image.jpg)</small>
-        </div>
-
-        <button type="submit" className="submit-button">
-          <i className="fas fa-paper-plane"></i> Publish Blog
-        </button>
-      </form>
+      </section>
     </div>
   );
 }

@@ -1,20 +1,98 @@
-.add-blog-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border-radius: 16px;
+.add-blog-page {
+  min-height: 100vh;
   background-color: #ffffff;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-.add-blog-container h2 {
-  font-size: 2rem;
-  color: #202124;
-  margin-bottom: 2rem;
+/* Hero Section */
+.add-blog-header {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-blog-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+  opacity: 0.1;
+}
+
+.add-blog-header .header-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.add-blog-header h1 {
+  font-size: 3rem;
+  margin: 0;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.add-blog-header .header-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Form Section */
+.add-blog-section {
+  padding: 3rem 2rem;
+  background-color: #f8f9fa;
+}
+
+.add-blog-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.form-header {
+  padding: 2rem 2rem 1rem;
+  border-bottom: 1px solid #f1f3f4;
   text-align: center;
 }
 
-.add-blog-container form {
+.form-header h2 {
+  font-size: 1.75rem;
+  color: #202124;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.form-header h2 i {
+  color: #1a73e8;
+}
+
+.form-header p {
+  color: #5f6368;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.blog-form {
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -30,6 +108,14 @@
   font-size: 1rem;
   font-weight: 500;
   color: #202124;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group label i {
+  color: #1a73e8;
+  font-size: 1.1rem;
 }
 
 .form-group input,
@@ -41,7 +127,13 @@
   border-radius: 8px;
   color: #202124;
   background-color: #ffffff;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+  border-color: #1a73e8;
 }
 
 .form-group input:focus,
@@ -60,6 +152,7 @@
 .form-group textarea {
   resize: vertical;
   min-height: 200px;
+  line-height: 1.6;
 }
 
 .form-group select {
@@ -76,23 +169,52 @@
   font-size: 0.85rem;
   color: #5f6368;
   margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
+.form-help i {
+  color: #1a73e8;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cancel-button,
 .submit-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background-color: #1a73e8;
-  color: white;
-  padding: 1rem 2rem;
-  border: none;
+  padding: 0.8rem 1.5rem;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
+  text-decoration: none;
+}
+
+.cancel-button {
+  background-color: #f1f3f4;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+}
+
+.cancel-button:hover {
+  background-color: #e8eaed;
+  color: #202124;
+}
+
+.submit-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  flex: 1;
 }
 
 .submit-button:hover {
@@ -106,18 +228,69 @@
   box-shadow: none;
 }
 
-.submit-button i {
-  font-size: 1.1rem;
-}
-
+/* Responsive Design */
 @media (max-width: 768px) {
-  .add-blog-container {
-    margin: 1rem;
+  .add-blog-header {
+    padding: 3rem 1.5rem;
+  }
+
+  .add-blog-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .add-blog-header .header-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .add-blog-section {
+    padding: 2rem 1rem;
+  }
+
+  .form-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+
+  .form-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .blog-form {
     padding: 1.5rem;
   }
 
-  .add-blog-container h2 {
-    font-size: 1.75rem;
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-blog-header {
+    padding: 2.5rem 1rem;
+  }
+
+  .add-blog-header h1 {
+    font-size: 2rem;
+  }
+
+  .add-blog-header .header-subtitle {
+    font-size: 1rem;
+  }
+
+  .form-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .form-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .blog-form {
+    padding: 1.25rem;
   }
 
   .form-group input,
@@ -126,9 +299,31 @@
     font-size: 0.95rem;
     padding: 0.7rem 0.9rem;
   }
-
-  .submit-button {
-    width: 100%;
-    padding: 0.9rem 1.5rem;
-  }
 }
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  color: #5f6368;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1a73e8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
