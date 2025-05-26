@@ -71,6 +71,7 @@ function AddBlog() {
         lastViewedBy: null,
         lastViewedAt: null,
         likes: 0,
+        likedBy: [],
         comments: []
       });
       alert("Blog added successfully!");

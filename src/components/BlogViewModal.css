@@ -178,6 +178,67 @@
   font-size: 1.1rem;
 }
 
+.modal-blog-stat.like-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #1a73e8;
+  transition: all 0.2s ease;
+}
+
+.modal-blog-stat.like-button:hover {
+  transform: scale(1.1);
+}
+
+.modal-blog-stat.like-button.liked {
+  color: #e74c3c;
+}
+
+.modal-blog-stat.like-button.liked i {
+  color: #e74c3c;
+}
+
+.modal-blog-stat.like-button:hover {
+  color: #1557b0;
+}
+
+.modal-blog-stat.like-button:hover i {
+  color: #1557b0;
+}
+
+.modal-blog-stat.like-button i {
+  transition: all 0.2s ease;
+  color: #1a73e8;
+}
+
+.modal-blog-stat.like-button.liked:hover {
+  color: #c0392b;
+}
+
+.modal-blog-stat.like-button.liked:hover i {
+  color: #c0392b;
+}
+
+.modal-blog-stat.like-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Add animation for like action */
+@keyframes likeAnimation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.modal-blog-stat.like-button.liked i {
+  animation: likeAnimation 0.3s ease;
+}
+
 /* Scrollbar Styles */
 .modal-content::-webkit-scrollbar {
   width: 8px;
