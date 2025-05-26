@@ -228,6 +228,103 @@
   box-shadow: none;
 }
 
+/* Form Validation Styles */
+.required-mark {
+  color: #e74c3c;
+  margin-left: 4px;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.error-message i {
+  font-size: 1rem;
+}
+
+.form-group input.error,
+.form-group textarea.error,
+.form-group select.error {
+  border-color: #e74c3c;
+  background-color: #fff5f5;
+}
+
+.form-group input.error:focus,
+.form-group textarea.error:focus,
+.form-group select.error:focus {
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.form-help {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5f6368;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.form-help i {
+  color: #1a73e8;
+}
+
+/* Submit Button Loading State */
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #1a73e8;
+}
+
+.submit-button i.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Group Focus States */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  outline: none;
+}
+
+/* Form Group Hover States */
+.form-group input:hover:not(.error),
+.form-group textarea:hover:not(.error),
+.form-group select:hover:not(.error) {
+  border-color: #1a73e8;
+}
+
+/* Character Count Indicator */
+.form-group textarea {
+  position: relative;
+}
+
+.form-group textarea::after {
+  content: attr(data-count);
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 0.8rem;
+  color: #5f6368;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .add-blog-header {
@@ -266,6 +363,14 @@
   .submit-button {
     width: 100%;
   }
+
+  .error-message {
+    font-size: 0.85rem;
+  }
+
+  .form-help {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -298,6 +403,14 @@
   .form-group select {
     font-size: 0.95rem;
     padding: 0.7rem 0.9rem;
+  }
+
+  .error-message {
+    font-size: 0.8rem;
+  }
+
+  .form-help {
+    font-size: 0.75rem;
   }
 }
 

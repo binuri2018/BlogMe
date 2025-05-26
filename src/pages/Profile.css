@@ -1002,4 +1002,208 @@
   }
 }
 
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'); 
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+/* Edit Blog Form Validation Styles */
+.edit-blog-form .required-mark {
+  color: #e74c3c;
+  margin-left: 4px;
+}
+
+.edit-blog-form .error-message {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.edit-blog-form .error-message i {
+  font-size: 1rem;
+}
+
+.edit-blog-form .form-group input.error,
+.edit-blog-form .form-group textarea.error,
+.edit-blog-form .form-group select.error {
+  border-color: #e74c3c;
+  background-color: #fff5f5;
+}
+
+.edit-blog-form .form-group input.error:focus,
+.edit-blog-form .form-group textarea.error:focus,
+.edit-blog-form .form-group select.error:focus {
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.edit-blog-form .form-help {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5f6368;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.edit-blog-form .form-help i {
+  color: #1a73e8;
+}
+
+/* Edit Form Header */
+.edit-blog-form .form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.edit-blog-form .form-header h3 {
+  font-size: 1.5rem;
+  color: #202124;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.edit-blog-form .form-header h3 i {
+  color: #1a73e8;
+}
+
+.edit-blog-form .close-edit-btn {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.edit-blog-form .close-edit-btn:hover {
+  background-color: #f1f3f4;
+  color: #202124;
+}
+
+/* Edit Form Actions */
+.edit-blog-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.edit-blog-form .cancel-button,
+.edit-blog-form .save-button {
+  padding: 0.9rem 1.75rem;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.edit-blog-form .cancel-button {
+  background-color: #f1f3f4;
+  color: #5f6368;
+  border: none;
+}
+
+.edit-blog-form .cancel-button:hover {
+  background-color: #e8eaed;
+  color: #202124;
+}
+
+.edit-blog-form .save-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+}
+
+.edit-blog-form .save-button:hover:not(:disabled) {
+  background-color: #1557b0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.edit-blog-form .save-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #1a73e8;
+}
+
+.edit-blog-form .save-button i.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Edit Form Focus States */
+.edit-blog-form .form-group input:focus,
+.edit-blog-form .form-group textarea:focus,
+.edit-blog-form .form-group select:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  outline: none;
+}
+
+/* Edit Form Hover States */
+.edit-blog-form .form-group input:hover:not(.error),
+.edit-blog-form .form-group textarea:hover:not(.error),
+.edit-blog-form .form-group select:hover:not(.error) {
+  border-color: #1a73e8;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .edit-blog-form .error-message {
+    font-size: 0.85rem;
+  }
+
+  .edit-blog-form .form-help {
+    font-size: 0.8rem;
+  }
+
+  .edit-blog-form .form-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .edit-blog-form .form-actions {
+    flex-direction: column;
+  }
+
+  .edit-blog-form .cancel-button,
+  .edit-blog-form .save-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-blog-form .error-message {
+    font-size: 0.8rem;
+  }
+
+  .edit-blog-form .form-help {
+    font-size: 0.75rem;
+  }
+
+  .edit-blog-form .form-header h3 {
+    font-size: 1.2rem;
+  }
+} 
