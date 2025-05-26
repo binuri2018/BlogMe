@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
-import { collection, getDocs, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, onSnapshot, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import AuthorProfileModal from '../components/AuthorProfileModal';
+import BlogViewModal from '../components/BlogViewModal';
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
@@ -14,6 +15,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [selectedAuthor, setSelectedAuthor] = useState(null);
+  const [selectedBlog, setSelectedBlog] = useState(null);
   const navigate = useNavigate();
 
   const categories = [
@@ -75,6 +77,62 @@ const Home = () => {
     if (author && author.uid) {
       setSelectedAuthor(author);
     }
+  };
+
+  const handleBlogClick = async (blog) => {
+    try {
+      // Get the blog document reference
+      const blogRef = doc(db, 'blogs', blog.id);
+      
+      // Get the current blog data to check last view
+      const blogDoc = await getDoc(blogRef);
+      const blogData = blogDoc.data();
+      
+      // Get user's last view timestamp from localStorage
+      const lastViewKey = `lastView_${blog.id}`;
+      const lastView = localStorage.getItem(lastViewKey);
+      const now = new Date().getTime();
+      
+      // Only increment view if:
+      // 1. User hasn't viewed this blog in the last hour
+      // 2. Or if it's a different user (based on auth state)
+      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+      const shouldIncrementView = !lastView || 
+        (now - parseInt(lastView) > oneHour) || 
+        (auth.currentUser && blogData.lastViewedBy !== auth.currentUser.uid);
+
+      if (shouldIncrementView) {
+        // Update the view count
+        await updateDoc(blogRef, {
+          views: increment(1),
+          lastViewedBy: auth.currentUser ? auth.currentUser.uid : 'anonymous',
+          lastViewedAt: new Date()
+        });
+
+        // Update local storage with current timestamp
+        localStorage.setItem(lastViewKey, now.toString());
+
+        // Update the blog object in state to reflect new view count
+        setSelectedBlog(prevBlog => {
+          if (!prevBlog) return blog;
+          return {
+            ...prevBlog,
+            views: (prevBlog.views || 0) + 1
+          };
+        });
+      } else {
+        // If we're not incrementing views, just set the blog
+        setSelectedBlog(blog);
+      }
+    } catch (error) {
+      console.error('Error updating view count:', error);
+      // Still open the modal even if view count update fails
+      setSelectedBlog(blog);
+    }
+  };
+
+  const handleCloseBlogModal = () => {
+    setSelectedBlog(null);
   };
 
   const features = [
@@ -152,7 +210,12 @@ const Home = () => {
         <div className="blog-grid">
           {filteredBlogs.length > 0 ? (
             filteredBlogs.map(blog => (
-              <div key={blog.id} className="blog-card">
+              <div 
+                key={blog.id} 
+                className="blog-card"
+                onClick={() => handleBlogClick(blog)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="blog-image-container">
                   {blog.blogImage ? (
                     <img 
@@ -182,21 +245,9 @@ const Home = () => {
                   <div className="blog-excerpt-container">
                     <p className="blog-excerpt">
                       {blog.content ? (
-                        <>
-                          {blog.content.split('\n').map((paragraph, index) => (
-                            <React.Fragment key={index}>
-                              {paragraph}
-                              {index < blog.content.split('\n').length - 1 && <br />}
-                            </React.Fragment>
-                          ))}
-                        </>
+                        blog.content.split('\n')[0].substring(0, 150) + (blog.content.split('\n')[0].length > 150 ? '...' : '')
                       ) : 'No content available'}
                     </p>
-                    {blog.content && blog.content.length > 300 && (
-                      <div className="read-more-overlay">
-                        <span className="read-more-text">Read More</span>
-                      </div>
-                    )}
                   </div>
                   <div className="blog-meta">
                     <div className="blog-meta-left">
@@ -319,6 +370,14 @@ const Home = () => {
         <AuthorProfileModal
           author={selectedAuthor}
           onClose={() => setSelectedAuthor(null)}
+        />
+      )}
+
+      {/* Blog View Modal */}
+      {selectedBlog && (
+        <BlogViewModal
+          blog={selectedBlog}
+          onClose={handleCloseBlogModal}
         />
       )}
     </div>

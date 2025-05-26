@@ -68,6 +68,8 @@ function AddBlog() {
         userId: user.uid,
         createdAt: serverTimestamp(),
         views: 0,
+        lastViewedBy: null,
+        lastViewedAt: null,
         likes: 0,
         comments: []
       });
