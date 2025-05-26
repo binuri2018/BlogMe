@@ -13,6 +13,7 @@ const Home = () => {
   const [blogs, setBlogs] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [selectedBlog, setSelectedBlog] = useState(null);
@@ -64,13 +65,24 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredBlogs(blogs);
-    } else {
-      const filtered = blogs.filter(blog => blog.category === selectedCategory);
-      setFilteredBlogs(filtered);
+    let filtered = blogs;
+
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(blog => blog.category === selectedCategory);
     }
-  }, [selectedCategory, blogs]);
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(blog => 
+        blog.title.toLowerCase().includes(query) ||
+        (blog.author?.displayName || blog.authorName || '').toLowerCase().includes(query)
+      );
+    }
+
+    setFilteredBlogs(filtered);
+  }, [selectedCategory, blogs, searchQuery]);
 
   useEffect(() => {
     // Load liked blogs from localStorage
@@ -283,18 +295,43 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div className="category-filter">
-          <div className="category-filter-container">
-            {categories.map((category) => (
-              <button
-                key={category.value}
-                className={`category-filter-button ${selectedCategory === category.value ? 'active' : ''}`}
-                onClick={() => handleCategoryChange(category.value)}
-              >
-                {category.label}
-              </button>
-            ))}
+        {/* Search and Filter Section */}
+        <div className="search-filter-section">
+          <div className="search-container">
+            <div className="search-input-wrapper">
+              <i className="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search blogs by title or author..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button 
+                  className="clear-search-btn"
+                  onClick={() => setSearchQuery('')}
+                  title="Clear search"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter */}
+          <div className="category-filter">
+            <div className="category-filter-container">
+              {categories.map((category) => (
+                <button
+                  key={category.value}
+                  className={`category-filter-button ${selectedCategory === category.value ? 'active' : ''}`}
+                  onClick={() => handleCategoryChange(category.value)}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -379,9 +416,15 @@ const Home = () => {
             ))
           ) : (
             <div className="no-blogs-message">
-              <i className="fas fa-newspaper"></i>
+              <i className="fas fa-search"></i>
               <h3>No blogs found</h3>
-              <p>There are no blogs in this category yet.</p>
+              <p>
+                {searchQuery 
+                  ? `No blogs match your search "${searchQuery}"`
+                  : selectedCategory !== 'all'
+                    ? `There are no blogs in the ${selectedCategory} category yet.`
+                    : 'There are no blogs available at the moment.'}
+              </p>
             </div>
           )}
         </div>
