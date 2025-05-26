@@ -12,6 +12,8 @@ function AddBlog() {
   const [blogImage, setBlogImage] = useState("");
   const [category, setCategory] = useState("");
   const [authorName, setAuthorName] = useState("");
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const categories = [
@@ -49,8 +51,73 @@ function AddBlog() {
     fetchUserData();
   }, []);
 
+  // Helper function to capitalize first letter
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  // Validation rules
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Title validation
+    if (!title.trim()) {
+      newErrors.title = 'Title is required';
+    } else if (title.length < 5) {
+      newErrors.title = 'Title must be at least 5 characters long';
+    } else if (title.length > 100) {
+      newErrors.title = 'Title must not exceed 100 characters';
+    }
+
+    // Content validation
+    if (!content.trim()) {
+      newErrors.content = 'Content is required';
+    } else if (content.length < 50) {
+      newErrors.content = 'Content must be at least 50 characters long';
+    }
+
+    // Category validation
+    if (!category) {
+      newErrors.category = 'Please select a category';
+    }
+
+    // Blog Image URL validation
+    if (!blogImage.trim()) {
+      newErrors.blogImage = 'Blog image URL is required';
+    } else {
+      try {
+        new URL(blogImage);
+        // Check if the URL ends with an image extension
+        const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+        const hasValidExtension = validImageExtensions.some(ext => 
+          blogImage.toLowerCase().endsWith(ext)
+        );
+        if (!hasValidExtension) {
+          newErrors.blogImage = 'URL must end with a valid image extension (.jpg, .jpeg, .png, .gif, .webp)';
+        }
+      } catch (e) {
+        newErrors.blogImage = 'Please enter a valid URL';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      // Scroll to the first error
+      const firstError = document.querySelector('.error-message');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const user = auth.currentUser;
@@ -60,10 +127,10 @@ function AddBlog() {
       }
 
       const blogData = {
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
         category,
-        blogImage,
+        blogImage: blogImage.trim(),
         createdAt: new Date(),
         userId: user.uid,
         authorName: user.displayName || 'Anonymous',
@@ -82,7 +149,18 @@ function AddBlog() {
     } catch (error) {
       console.error("Error adding blog:", error.message);
       alert("Failed to add blog. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // Helper function to render error message
+  const renderError = (field) => {
+    return errors[field] ? (
+      <div className="error-message">
+        <i className="fas fa-exclamation-circle"></i> {errors[field]}
+      </div>
+    ) : null;
   };
 
   return (
@@ -109,26 +187,44 @@ function AddBlog() {
             <div className="form-group">
               <label htmlFor="title">
                 <i className="fas fa-heading"></i> Blog Title
+                <span className="required-mark">*</span>
               </label>
               <input
                 type="text"
                 id="title"
-                placeholder="Enter a catchy title for your blog"
+                placeholder="Enter a catchy title for your blog (5-100 characters)"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
+                onChange={(e) => {
+                  setTitle(capitalizeFirstLetter(e.target.value));
+                  if (errors.title) {
+                    setErrors(prev => ({ ...prev, title: null }));
+                  }
+                }}
+                className={errors.title ? 'error' : ''}
+                maxLength={100}
               />
+              {renderError('title')}
+              <small className="form-help">
+                <i className="fas fa-info-circle"></i> 
+                Title should be between 5 and 100 characters
+              </small>
             </div>
 
             <div className="form-group">
               <label htmlFor="category">
                 <i className="fas fa-tags"></i> Category
+                <span className="required-mark">*</span>
               </label>
               <select
                 id="category"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  if (errors.category) {
+                    setErrors(prev => ({ ...prev, category: null }));
+                  }
+                }}
+                className={errors.category ? 'error' : ''}
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (
@@ -137,41 +233,56 @@ function AddBlog() {
                   </option>
                 ))}
               </select>
+              {renderError('category')}
             </div>
 
             <div className="form-group">
               <label htmlFor="content">
                 <i className="fas fa-align-left"></i> Blog Content
+                <span className="required-mark">*</span>
               </label>
               <textarea
                 id="content"
-                placeholder="Write your blog content here... (You can use multiple paragraphs)"
+                placeholder="Write your blog content here... (minimum 50 characters)"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                required
+                onChange={(e) => {
+                  setContent(capitalizeFirstLetter(e.target.value));
+                  if (errors.content) {
+                    setErrors(prev => ({ ...prev, content: null }));
+                  }
+                }}
+                className={errors.content ? 'error' : ''}
                 rows="12"
               />
+              {renderError('content')}
               <small className="form-help">
                 <i className="fas fa-info-circle"></i> 
-                Write engaging content that captures your readers' attention. Use paragraphs to organize your thoughts.
+                Write engaging content that captures your readers' attention. Minimum 50 characters required.
               </small>
             </div>
 
             <div className="form-group">
               <label htmlFor="blogImage">
                 <i className="fas fa-image"></i> Blog Image URL
+                <span className="required-mark">*</span>
               </label>
               <input
                 type="url"
                 id="blogImage"
                 placeholder="Enter the URL of your blog image (e.g., https://example.com/image.jpg)"
                 value={blogImage}
-                onChange={(e) => setBlogImage(e.target.value)}
-                required
+                onChange={(e) => {
+                  setBlogImage(e.target.value);
+                  if (errors.blogImage) {
+                    setErrors(prev => ({ ...prev, blogImage: null }));
+                  }
+                }}
+                className={errors.blogImage ? 'error' : ''}
               />
+              {renderError('blogImage')}
               <small className="form-help">
                 <i className="fas fa-info-circle"></i> 
-                Add a high-quality image that represents your blog post. Recommended size: 800x450 pixels.
+                Add a high-quality image URL that ends with .jpg, .jpeg, .png, .gif, or .webp
               </small>
             </div>
 
@@ -179,8 +290,20 @@ function AddBlog() {
               <Link to="/home" className="cancel-button">
                 <i className="fas fa-times"></i> Cancel
               </Link>
-              <button type="submit" className="submit-button">
-                <i className="fas fa-paper-plane"></i> Publish Blog
+              <button 
+                type="submit" 
+                className="submit-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i> Publishing...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-paper-plane"></i> Publish Blog
+                  </>
+                )}
               </button>
             </div>
           </form>

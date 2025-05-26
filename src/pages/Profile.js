@@ -13,6 +13,20 @@ function Profile() {
     bio: "",
     location: "",
   });
+
+  const categories = [
+    { value: "technology", label: "Technology" },
+    { value: "food", label: "Food & Cooking" },
+    { value: "travel", label: "Travel" },
+    { value: "lifestyle", label: "Lifestyle" },
+    { value: "health", label: "Health & Wellness" },
+    { value: "education", label: "Education" },
+    { value: "business", label: "Business" },
+    { value: "entertainment", label: "Entertainment" },
+    { value: "sports", label: "Sports" },
+    { value: "other", label: "Other" }
+  ];
+
   const [activeTab, setActiveTab] = useState('profile');
   const [editing, setEditing] = useState(false);
   const [blogs, setBlogs] = useState([]);
@@ -33,6 +47,8 @@ function Profile() {
   const [showAuthorInfo, setShowAuthorInfo] = useState(false);
   const [selectedAuthor, setSelectedAuthor] = useState(null);
   const navigate = useNavigate();
+  const [editErrors, setEditErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Format date helper
   const formatDate = (timestamp) => {
@@ -45,6 +61,12 @@ function Profile() {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+
+  // Helper function to capitalize first letter
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
   // Fetch profile data
@@ -144,17 +166,32 @@ function Profile() {
 
   // Blog edit handlers
   const handleEditBlog = (blog) => {
-    setEditingBlog(blog);
+    setEditingBlog({
+      ...blog,
+      title: capitalizeFirstLetter(blog.title),
+      content: capitalizeFirstLetter(blog.content)
+    });
     setBlogFormData({
-      title: blog.title,
-      content: blog.content,
+      title: capitalizeFirstLetter(blog.title),
+      content: capitalizeFirstLetter(blog.content),
       backgroundImage: blog.backgroundImage || "",
       blogImage: blog.blogImage || "",
     });
   };
 
   const handleBlogChange = (e) => {
-    setBlogFormData({ ...blogFormData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'title' || name === 'content') {
+      setBlogFormData(prev => ({
+        ...prev,
+        [name]: capitalizeFirstLetter(value)
+      }));
+    } else {
+      setBlogFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSaveBlog = async () => {
@@ -230,6 +267,105 @@ function Profile() {
   const closeAuthorInfo = () => {
     setShowAuthorInfo(false);
     setSelectedAuthor(null);
+  };
+
+  // Validation rules for edit form
+  const validateEditForm = (formData) => {
+    const newErrors = {};
+    
+    // Title validation
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    } else if (formData.title.length < 5) {
+      newErrors.title = 'Title must be at least 5 characters long';
+    } else if (formData.title.length > 100) {
+      newErrors.title = 'Title must not exceed 100 characters';
+    }
+
+    // Content validation
+    if (!formData.content.trim()) {
+      newErrors.content = 'Content is required';
+    } else if (formData.content.length < 50) {
+      newErrors.content = 'Content must be at least 50 characters long';
+    }
+
+    // Category validation
+    if (!formData.category) {
+      newErrors.category = 'Please select a category';
+    }
+
+    // Blog Image URL validation
+    if (!formData.blogImage.trim()) {
+      newErrors.blogImage = 'Blog image URL is required';
+    } else {
+      try {
+        new URL(formData.blogImage);
+        // Check if the URL ends with an image extension
+        const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+        const hasValidExtension = validImageExtensions.some(ext => 
+          formData.blogImage.toLowerCase().endsWith(ext)
+        );
+        if (!hasValidExtension) {
+          newErrors.blogImage = 'URL must end with a valid image extension (.jpg, .jpeg, .png, .gif, .webp)';
+        }
+      } catch (e) {
+        newErrors.blogImage = 'Please enter a valid URL';
+      }
+    }
+
+    setEditErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Helper function to render error message
+  const renderEditError = (field) => {
+    return editErrors[field] ? (
+      <div className="error-message">
+        <i className="fas fa-exclamation-circle"></i> {editErrors[field]}
+      </div>
+    ) : null;
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateEditForm(editingBlog)) {
+      // Scroll to the first error
+      const firstError = document.querySelector('.error-message');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const blogRef = doc(db, "blogs", editingBlog.id);
+      await updateDoc(blogRef, {
+        title: editingBlog.title.trim(),
+        content: editingBlog.content.trim(),
+        category: editingBlog.category,
+        blogImage: editingBlog.blogImage.trim(),
+        updatedAt: new Date()
+      });
+
+      // Update local state
+      setBlogs(blogs.map(blog => 
+        blog.id === editingBlog.id 
+          ? { ...blog, ...editingBlog, updatedAt: new Date() }
+          : blog
+      ));
+
+      setEditingBlog(null);
+      setEditErrors({});
+      alert("Blog updated successfully!");
+    } catch (error) {
+      console.error("Error updating blog:", error);
+      alert("Failed to update blog. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -530,62 +666,153 @@ function Profile() {
       {editingBlog && (
         <div className="edit-blog-modal">
           <div className="edit-blog-form">
-            <div className="modal-header">
-              <h3> Edit Blog</h3>
-              
+            <div className="form-header">
+              <h3><i className="fas fa-edit"></i> Edit Blog</h3>
+              <button 
+                className="close-edit-btn"
+                onClick={() => {
+                  setEditingBlog(null);
+                  setEditErrors({});
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); handleSaveBlog(); }}>
+
+            <form onSubmit={handleSaveEdit}>
               <div className="form-group">
-                <label htmlFor="title">
-                  <i className="fas fa-heading"></i> Title
+                <label htmlFor="edit-title">
+                  <i className="fas fa-heading"></i> Blog Title
+                  <span className="required-mark">*</span>
                 </label>
                 <input
                   type="text"
-                  id="title"
-                  name="title"
-                  value={blogFormData.title}
-                  onChange={handleBlogChange}
-                  placeholder="Enter blog title"
-                  required
+                  id="edit-title"
+                  value={editingBlog.title}
+                  onChange={(e) => {
+                    setEditingBlog(prev => ({ 
+                      ...prev, 
+                      title: capitalizeFirstLetter(e.target.value) 
+                    }));
+                    if (editErrors.title) {
+                      setEditErrors(prev => ({ ...prev, title: null }));
+                    }
+                  }}
+                  className={editErrors.title ? 'error' : ''}
+                  maxLength={100}
+                  placeholder="Enter a catchy title for your blog (5-100 characters)"
                 />
+                {renderEditError('title')}
+                <small className="form-help">
+                  <i className="fas fa-info-circle"></i> 
+                  Title should be between 5 and 100 characters
+                </small>
               </div>
+
               <div className="form-group">
-                <label htmlFor="content">
-                  <i className="fas fa-align-left"></i> Content
+                <label htmlFor="edit-category">
+                  <i className="fas fa-tags"></i> Category
+                  <span className="required-mark">*</span>
+                </label>
+                <select
+                  id="edit-category"
+                  value={editingBlog.category}
+                  onChange={(e) => {
+                    setEditingBlog(prev => ({ ...prev, category: e.target.value }));
+                    if (editErrors.category) {
+                      setEditErrors(prev => ({ ...prev, category: null }));
+                    }
+                  }}
+                  className={editErrors.category ? 'error' : ''}
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+                {renderEditError('category')}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-content">
+                  <i className="fas fa-align-left"></i> Blog Content
+                  <span className="required-mark">*</span>
                 </label>
                 <textarea
-                  id="content"
-                  name="content"
-                  value={blogFormData.content}
-                  onChange={handleBlogChange}
-                  placeholder="Write your blog content..."
-                  rows="6"
-                  required
+                  id="edit-content"
+                  value={editingBlog.content}
+                  onChange={(e) => {
+                    setEditingBlog(prev => ({ 
+                      ...prev, 
+                      content: capitalizeFirstLetter(e.target.value) 
+                    }));
+                    if (editErrors.content) {
+                      setEditErrors(prev => ({ ...prev, content: null }));
+                    }
+                  }}
+                  className={editErrors.content ? 'error' : ''}
+                  rows="12"
+                  placeholder="Write your blog content here... (minimum 50 characters)"
                 />
+                {renderEditError('content')}
+                <small className="form-help">
+                  <i className="fas fa-info-circle"></i> 
+                  Write engaging content that captures your readers' attention. Minimum 50 characters required.
+                </small>
               </div>
+
               <div className="form-group">
-                <label htmlFor="blogImage">
+                <label htmlFor="edit-blogImage">
                   <i className="fas fa-image"></i> Blog Image URL
+                  <span className="required-mark">*</span>
                 </label>
                 <input
                   type="url"
-                  id="blogImage"
-                  name="blogImage"
-                  value={blogFormData.blogImage}
-                  onChange={handleBlogChange}
-                  placeholder="Enter image URL"
-                  required
+                  id="edit-blogImage"
+                  value={editingBlog.blogImage}
+                  onChange={(e) => {
+                    setEditingBlog(prev => ({ ...prev, blogImage: e.target.value }));
+                    if (editErrors.blogImage) {
+                      setEditErrors(prev => ({ ...prev, blogImage: null }));
+                    }
+                  }}
+                  className={editErrors.blogImage ? 'error' : ''}
+                  placeholder="Enter the URL of your blog image (e.g., https://example.com/image.jpg)"
                 />
+                {renderEditError('blogImage')}
                 <small className="form-help">
-                  <i className="fas fa-info-circle"></i> Add a high-quality image URL for your blog
+                  <i className="fas fa-info-circle"></i> 
+                  Add a high-quality image URL that ends with .jpg, .jpeg, .png, .gif, or .webp
                 </small>
               </div>
+
               <div className="form-actions">
-                <button type="button" onClick={() => setEditingBlog(null)} className="cancel-btn">
+                <button 
+                  type="button" 
+                  className="cancel-button"
+                  onClick={() => {
+                    setEditingBlog(null);
+                    setEditErrors({});
+                  }}
+                >
                   <i className="fas fa-times"></i> Cancel
                 </button>
-                <button type="submit" className="save-btn">
-                  <i className="fas fa-save"></i> Save Changes
+                <button 
+                  type="submit" 
+                  className="save-button"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save"></i> Save Changes
+                    </>
+                  )}
                 </button>
               </div>
             </form>
