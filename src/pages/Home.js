@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
-import { collection, getDocs, query, orderBy, limit, onSnapshot, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, onSnapshot, doc, updateDoc, increment, getDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import AuthorProfileModal from '../components/AuthorProfileModal';
@@ -16,6 +16,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const [likedBlogs, setLikedBlogs] = useState(new Set());
   const navigate = useNavigate();
 
   const categories = [
@@ -45,6 +46,8 @@ const Home = () => {
         return {
           id: doc.id,
           ...data,
+          likes: data.likes || 0,
+          likedBy: data.likedBy || [],
           author: {
             displayName: data.authorName || data.author?.displayName || 'Anonymous',
             uid: data.userId || data.author?.uid || null,
@@ -68,6 +71,14 @@ const Home = () => {
       setFilteredBlogs(filtered);
     }
   }, [selectedCategory, blogs]);
+
+  useEffect(() => {
+    // Load liked blogs from localStorage
+    const storedLikes = localStorage.getItem('likedBlogs');
+    if (storedLikes) {
+      setLikedBlogs(new Set(JSON.parse(storedLikes)));
+    }
+  }, []);
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
@@ -133,6 +144,87 @@ const Home = () => {
 
   const handleCloseBlogModal = () => {
     setSelectedBlog(null);
+  };
+
+  const handleBlogLikeUpdate = (updatedBlog) => {
+    // Update the blogs state
+    setBlogs(prevBlogs => 
+      prevBlogs.map(blog => 
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      )
+    );
+
+    // Update filtered blogs
+    setFilteredBlogs(prevBlogs => 
+      prevBlogs.map(blog => 
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      )
+    );
+
+    // Update selected blog if it's the one being liked
+    setSelectedBlog(prevBlog => 
+      prevBlog?.id === updatedBlog.id ? updatedBlog : prevBlog
+    );
+
+    // Update liked blogs in localStorage
+    const newLikedBlogs = new Set(likedBlogs);
+    if (updatedBlog.likedBy?.includes(auth.currentUser?.uid)) {
+      newLikedBlogs.add(updatedBlog.id);
+    } else {
+      newLikedBlogs.delete(updatedBlog.id);
+    }
+    setLikedBlogs(newLikedBlogs);
+    localStorage.setItem('likedBlogs', JSON.stringify([...newLikedBlogs]));
+  };
+
+  const handleLike = async (blogId, e) => {
+    e.stopPropagation(); // Prevent opening the modal when clicking like button
+    
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please sign in to like blogs');
+        return;
+      }
+
+      // Find the current blog data from state
+      const currentBlog = blogs.find(blog => blog.id === blogId);
+      if (!currentBlog) {
+        console.error('Blog not found in state');
+        return;
+      }
+
+      // Check if user has already liked this blog using the current state
+      const hasLiked = currentBlog.likedBy?.includes(user.uid);
+      
+      const blogRef = doc(db, 'blogs', blogId);
+      
+      // Update Firestore
+      await updateDoc(blogRef, {
+        likes: increment(hasLiked ? -1 : 1),
+        likedBy: hasLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
+      });
+
+      // Get the updated document to ensure we have the correct data
+      const updatedDoc = await getDoc(blogRef);
+      const updatedData = updatedDoc.data();
+
+      if (!updatedData) {
+        console.error('Failed to get updated blog data');
+        return;
+      }
+
+      // Update the blog state with the new data
+      handleBlogLikeUpdate({
+        ...currentBlog,
+        likes: updatedData.likes || 0,
+        likedBy: updatedData.likedBy || []
+      });
+
+    } catch (error) {
+      console.error('Error updating like:', error);
+      alert('Failed to update like. Please try again.');
+    }
   };
 
   const features = [
@@ -272,10 +364,14 @@ const Home = () => {
                         <i className="far fa-comment"></i>
                         {blog.comments?.length || 0}
                       </span>
-                      <span className="blog-stat">
-                        <i className="far fa-heart"></i>
+                      <button 
+                        className={`blog-stat like-button ${blog.likedBy?.includes(auth.currentUser?.uid) ? 'liked' : ''}`}
+                        onClick={(e) => handleLike(blog.id, e)}
+                        title={auth.currentUser ? "Click to like" : "Sign in to like"}
+                      >
+                        <i className={`${blog.likedBy?.includes(auth.currentUser?.uid) ? 'fas' : 'far'} fa-heart`}></i>
                         {blog.likes || 0}
-                      </span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -378,6 +474,7 @@ const Home = () => {
         <BlogViewModal
           blog={selectedBlog}
           onClose={handleCloseBlogModal}
+          onLikeUpdate={handleBlogLikeUpdate}
         />
       )}
     </div>

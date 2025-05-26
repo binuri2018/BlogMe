@@ -1,8 +1,59 @@
 import React from 'react';
+import { auth, db } from '../firebase';
+import { doc, updateDoc, increment, getDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import './BlogViewModal.css';
 
-const BlogViewModal = ({ blog, onClose }) => {
+const BlogViewModal = ({ blog, onClose, onLikeUpdate }) => {
   if (!blog) return null;
+
+  const handleLike = async (e) => {
+    e.stopPropagation();
+    
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please sign in to like blogs');
+        return;
+      }
+
+      const blogRef = doc(db, 'blogs', blog.id);
+      const blogDoc = await getDoc(blogRef);
+      const blogData = blogDoc.data();
+
+      if (!blogData) {
+        console.error('Blog not found');
+        return;
+      }
+
+      // Check if user has already liked this blog
+      const hasLiked = blogData.likedBy?.includes(user.uid);
+      
+      // Update Firestore
+      await updateDoc(blogRef, {
+        likes: increment(hasLiked ? -1 : 1),
+        likedBy: hasLiked ? arrayRemove(user.uid) : arrayUnion(user.uid)
+      });
+
+      // Get the updated document to ensure we have the correct data
+      const updatedDoc = await getDoc(blogRef);
+      const updatedData = updatedDoc.data();
+
+      // Call the onLikeUpdate callback with the updated data
+      if (onLikeUpdate) {
+        onLikeUpdate({
+          ...blog,
+          likes: updatedData.likes || 0,
+          likedBy: updatedData.likedBy || []
+        });
+      }
+
+    } catch (error) {
+      console.error('Error updating like:', error);
+      alert('Failed to update like. Please try again.');
+    }
+  };
+
+  const isLiked = blog.likedBy?.includes(auth.currentUser?.uid);
 
   return (
     <div className="blog-view-modal-overlay" onClick={onClose}>
@@ -60,10 +111,14 @@ const BlogViewModal = ({ blog, onClose }) => {
               <i className="far fa-comment"></i>
               {blog.comments?.length || 0} comments
             </span>
-            <span className="modal-blog-stat">
-              <i className="far fa-heart"></i>
+            <button 
+              className={`modal-blog-stat like-button ${isLiked ? 'liked' : ''}`}
+              onClick={handleLike}
+              title={auth.currentUser ? "Click to like" : "Sign in to like"}
+            >
+              <i className={`${isLiked ? 'fas' : 'far'} fa-heart`}></i>
               {blog.likes || 0} likes
-            </span>
+            </button>
           </div>
         </div>
       </div>
