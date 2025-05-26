@@ -58,8 +58,8 @@ npm install
    - Firestore Database
    - Storage (for blog images)
 
-4. Create a `.env` file in the root directory and add your Firebase configuration:
-```env
+4. Create a `src/firebase.js` file in the root directory and add your Firebase configuration:
+```src/firebase.js
 REACT_APP_FIREBASE_API_KEY=your_api_key
 REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
 REACT_APP_FIREBASE_PROJECT_ID=your_project_id
@@ -156,7 +156,7 @@ blog-me/
 
 ## 👥 Authors
 
-- Binuri Manodya - Initial work - [YourGitHub](https://github.com/binuri2018)
+- Binuri Manodya - Initial work - (https://github.com/binuri2018)
 
 ## 🙏 Acknowledgments
 
