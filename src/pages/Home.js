@@ -288,13 +288,7 @@ const Home = () => {
 
       {/* Blog Feed Section */}
       <section className="blog-feed">
-        <div className="section-header">
-          <div className="section-header-content">
-            <h2>Latest Stories</h2>
-            <p>Discover the most recent posts from our community</p>
-          </div>
-        </div>
-
+       
         {/* Search and Filter Section */}
         <div className="search-filter-section">
           <div className="search-container">
