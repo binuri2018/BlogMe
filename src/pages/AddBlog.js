@@ -59,21 +59,24 @@ function AddBlog() {
         return;
       }
 
-      await addDoc(collection(db, "blogs"), {
+      const blogData = {
         title,
         content,
-        blogImage,
         category,
-        authorName,
+        blogImage,
+        createdAt: new Date(),
         userId: user.uid,
-        createdAt: serverTimestamp(),
+        authorName: user.displayName || 'Anonymous',
+        authorPhotoURL: user.photoURL,
         views: 0,
         lastViewedBy: null,
         lastViewedAt: null,
         likes: 0,
         likedBy: [],
         comments: []
-      });
+      };
+
+      await addDoc(collection(db, "blogs"), blogData);
       alert("Blog added successfully!");
       navigate("/home");
     } catch (error) {
