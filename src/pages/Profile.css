@@ -520,29 +520,36 @@
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-.modal-header {
-  padding: 1.5rem;
+.edit-blog-form .modal-header {
+  padding: 2rem 2rem 1.5rem;
   border-bottom: 1px solid #f1f3f4;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
 }
 
-.modal-header h3 {
-  font-size: 1.5rem;
+.edit-blog-form .modal-header h3 {
+  font-size: 1.75rem;
   color: #202124;
   margin: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
 }
 
-.close-btn {
+.edit-blog-form .modal-header h3 i {
+  color: #1a73e8;
+  font-size: 1.5rem;
+}
+
+.edit-blog-form .modal-header .close-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
   background: none;
   border: none;
   color: #5f6368;
@@ -550,11 +557,120 @@
   padding: 0.5rem;
   border-radius: 50%;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
 }
 
-.close-btn:hover {
+.edit-blog-form .modal-header .close-btn:hover {
   background: #f1f3f4;
   color: #202124;
+  transform: scale(1.1);
+}
+
+.edit-blog-form .modal-header .close-btn i {
+  font-size: 1.2rem;
+}
+
+.edit-blog-form form {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.edit-blog-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.edit-blog-form .form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #202124;
+  font-weight: 500;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.edit-blog-form .form-group label i {
+  color: #1a73e8;
+}
+
+.edit-blog-form .form-group input,
+.edit-blog-form .form-group textarea {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  color: #202124;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.edit-blog-form .form-group textarea {
+  min-height: 200px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.edit-blog-form .form-group input:hover,
+.edit-blog-form .form-group textarea:hover {
+  border-color: #1a73e8;
+}
+
+.edit-blog-form .form-group input:focus,
+.edit-blog-form .form-group textarea:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.edit-blog-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f3f4;
+}
+
+.edit-blog-form .cancel-btn,
+.edit-blog-form .save-btn {
+  padding: 0.9rem 1.75rem;
+  font-size: 1.1rem;
+}
+
+.edit-blog-form .cancel-btn {
+  background-color: #f1f3f4;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+}
+
+.edit-blog-form .cancel-btn:hover {
+  background-color: #e8eaed;
+  color: #202124;
+}
+
+.edit-blog-form .save-btn {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  flex: 1;
+}
+
+.edit-blog-form .save-btn:hover {
+  background-color: #1557b0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.edit-blog-form .save-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 /* Author Info Modal */
@@ -757,8 +873,41 @@
     grid-template-columns: 1fr;
   }
 
-  .edit-blog-modal {
-    padding: 1rem;
+  .edit-blog-form {
+    max-width: 100%;
+    margin: 1rem;
+  }
+
+  .edit-blog-form form {
+    padding: 1.5rem;
+  }
+
+  .edit-blog-form .form-group input,
+  .edit-blog-form .form-group textarea {
+    padding: 0.9rem 1.1rem;
+    font-size: 1rem;
+  }
+
+  .edit-blog-form .form-actions {
+    flex-direction: column;
+  }
+
+  .edit-blog-form .cancel-btn,
+  .edit-blog-form .save-btn {
+    width: 100%;
+  }
+
+  .edit-blog-form .modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+
+  .edit-blog-form .modal-header h3 {
+    font-size: 1.5rem;
+  }
+
+  .edit-blog-form .modal-header .close-btn {
+    top: 1rem;
+    right: 1rem;
   }
 }
 
@@ -823,6 +972,33 @@
   .blog-author,
   .blog-date {
     width: 100%;
+  }
+
+  .edit-blog-form form {
+    padding: 1.25rem;
+  }
+
+  .edit-blog-form .form-group label {
+    font-size: 1rem;
+  }
+
+  .edit-blog-form .form-group input,
+  .edit-blog-form .form-group textarea {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .edit-blog-form .modal-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .edit-blog-form .modal-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .edit-blog-form .modal-header .close-btn {
+    width: 32px;
+    height: 32px;
   }
 }
 
