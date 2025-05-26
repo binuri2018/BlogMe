@@ -504,10 +504,8 @@ function Profile() {
         <div className="edit-blog-modal">
           <div className="edit-blog-form">
             <div className="modal-header">
-              <h3><i className="fas fa-edit"></i> Edit Blog</h3>
-              <button onClick={() => setEditingBlog(null)} className="close-btn">
-                <i className="fas fa-times"></i>
-              </button>
+              <h3> Edit Blog</h3>
+              
             </div>
             <form onSubmit={(e) => { e.preventDefault(); handleSaveBlog(); }}>
               <div className="form-group">
