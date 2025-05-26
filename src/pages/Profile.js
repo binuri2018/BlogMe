@@ -49,6 +49,8 @@ function Profile() {
   const navigate = useNavigate();
   const [editErrors, setEditErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [profileErrors, setProfileErrors] = useState({});
+  const [isProfileSubmitting, setIsProfileSubmitting] = useState(false);
 
   // Format date helper
   const formatDate = (timestamp) => {
@@ -79,7 +81,15 @@ function Profile() {
           const docRef = doc(db, "users", user.uid);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            setProfileData(docSnap.data());
+            const data = docSnap.data();
+            // Capitalize first letter of specific fields when loading data
+            setProfileData({
+              ...data,
+              firstName: capitalizeFirstLetter(data.firstName),
+              lastName: capitalizeFirstLetter(data.lastName),
+              bio: data.bio ? capitalizeFirstLetter(data.bio) : '',
+              location: data.location ? capitalizeFirstLetter(data.location) : ''
+            });
           }
         }
       } catch (error) {
@@ -136,21 +146,108 @@ function Profile() {
 
   // Profile handlers
   const handleChange = (e) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Capitalize first letter for specific fields
+    if (['firstName', 'lastName', 'bio', 'location'].includes(name)) {
+      setProfileData(prev => ({
+        ...prev,
+        [name]: capitalizeFirstLetter(value)
+      }));
+    } else {
+      setProfileData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+    
+    // Clear error when user starts typing
+    if (profileErrors[name]) {
+      setProfileErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
-  const handleSave = async () => {
+  // Validation rules for profile form
+  const validateProfileForm = (formData) => {
+    const newErrors = {};
+    
+    // First Name validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.length < 2) {
+      newErrors.firstName = 'First name must be at least 2 characters long';
+    } else if (formData.firstName.length > 50) {
+      newErrors.firstName = 'First name must not exceed 50 characters';
+    }
+
+    // Last Name validation
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    } else if (formData.lastName.length < 2) {
+      newErrors.lastName = 'Last name must be at least 2 characters long';
+    } else if (formData.lastName.length > 50) {
+      newErrors.lastName = 'Last name must not exceed 50 characters';
+    }
+
+    // Languages validation
+    if (formData.languages && formData.languages.length > 200) {
+      newErrors.languages = 'Languages must not exceed 200 characters';
+    }
+
+    // Location validation
+    if (formData.location && formData.location.length > 100) {
+      newErrors.location = 'Location must not exceed 100 characters';
+    }
+
+    // Bio validation
+    if (formData.bio && formData.bio.length > 500) {
+      newErrors.bio = 'Bio must not exceed 500 characters';
+    }
+
+    setProfileErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Helper function to render profile error message
+  const renderProfileError = (field) => {
+    return profileErrors[field] ? (
+      <div className="error-message">
+        <i className="fas fa-exclamation-circle"></i> {profileErrors[field]}
+      </div>
+    ) : null;
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    
+    if (!validateProfileForm(profileData)) {
+      // Scroll to the first error
+      const firstError = document.querySelector('.error-message');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    setIsProfileSubmitting(true);
+
     try {
       const user = auth.currentUser;
       if (user) {
         const docRef = doc(db, "users", user.uid);
-        await updateDoc(docRef, profileData);
+        await updateDoc(docRef, {
+          ...profileData,
+          updatedAt: serverTimestamp()
+        });
         alert("Profile updated successfully");
         setEditing(false);
+        setProfileErrors({});
       }
     } catch (error) {
       console.error("Error updating profile:", error.message);
       alert("Error updating profile. Please try again.");
+    } finally {
+      setIsProfileSubmitting(false);
     }
   };
 
@@ -442,10 +539,11 @@ function Profile() {
           </div>
 
           {editing ? (
-            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="profile-form">
+            <form onSubmit={handleSave} className="profile-form">
               <div className="form-group">
                 <label htmlFor="firstName">
                   <i className="fas fa-user"></i> First Name
+                  <span className="required-mark">*</span>
                 </label>
                 <input
                   type="text"
@@ -454,12 +552,19 @@ function Profile() {
                   value={profileData.firstName}
                   onChange={handleChange}
                   placeholder="Enter your first name"
+                  className={profileErrors.firstName ? 'error' : ''}
                   required
                 />
+                {renderProfileError('firstName')}
+                <small className="form-help">
+                  <i className="fas fa-info-circle"></i> 
+                  First name should be between 2 and 50 characters
+                </small>
               </div>
               <div className="form-group">
                 <label htmlFor="lastName">
                   <i className="fas fa-user"></i> Last Name
+                  <span className="required-mark">*</span>
                 </label>
                 <input
                   type="text"
@@ -468,8 +573,14 @@ function Profile() {
                   value={profileData.lastName}
                   onChange={handleChange}
                   placeholder="Enter your last name"
+                  className={profileErrors.lastName ? 'error' : ''}
                   required
                 />
+                {renderProfileError('lastName')}
+                <small className="form-help">
+                  <i className="fas fa-info-circle"></i> 
+                  Last name should be between 2 and 50 characters
+                </small>
               </div>
               <div className="form-group">
                 <label htmlFor="email">
@@ -497,7 +608,13 @@ function Profile() {
                   value={profileData.languages}
                   onChange={handleChange}
                   placeholder="Enter languages you know (e.g., English, Spanish)"
+                  className={profileErrors.languages ? 'error' : ''}
                 />
+                {renderProfileError('languages')}
+                <small className="form-help">
+                  <i className="fas fa-info-circle"></i> 
+                  List the languages you know, separated by commas
+                </small>
               </div>
               <div className="form-group">
                 <label htmlFor="location">
@@ -510,7 +627,13 @@ function Profile() {
                   value={profileData.location}
                   onChange={handleChange}
                   placeholder="Enter your location"
+                  className={profileErrors.location ? 'error' : ''}
                 />
+                {renderProfileError('location')}
+                <small className="form-help">
+                  <i className="fas fa-info-circle"></i> 
+                  Enter your city, country, or general location
+                </small>
               </div>
               <div className="form-group">
                 <label htmlFor="bio">
@@ -523,17 +646,39 @@ function Profile() {
                   onChange={handleChange}
                   placeholder="Tell us about yourself..."
                   rows="4"
+                  className={profileErrors.bio ? 'error' : ''}
                 />
+                {renderProfileError('bio')}
                 <small className="form-help">
-                  <i className="fas fa-info-circle"></i> Write a brief description about yourself
+                  <i className="fas fa-info-circle"></i> 
+                  Write a brief description about yourself (max 500 characters)
                 </small>
               </div>
               <div className="form-actions">
-                <button type="button" onClick={() => setEditing(false)} className="cancel-btn">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setEditing(false);
+                    setProfileErrors({});
+                  }} 
+                  className="cancel-btn"
+                >
                   <i className="fas fa-times"></i> Cancel
                 </button>
-                <button type="submit" className="save-btn">
-                  <i className="fas fa-save"></i> Save Changes
+                <button 
+                  type="submit" 
+                  className="save-btn"
+                  disabled={isProfileSubmitting}
+                >
+                  {isProfileSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save"></i> Save Changes
+                    </>
+                  )}
                 </button>
               </div>
             </form>

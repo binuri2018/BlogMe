@@ -1206,4 +1206,116 @@
   .edit-blog-form .form-header h3 {
     font-size: 1.2rem;
   }
+}
+
+/* Profile Form Validation Styles */
+.profile-form .required-mark {
+  color: #e74c3c;
+  margin-left: 4px;
+}
+
+.profile-form .error-message {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.profile-form .error-message i {
+  font-size: 1rem;
+}
+
+.profile-form .form-group input.error,
+.profile-form .form-group textarea.error {
+  border-color: #e74c3c;
+  background-color: #fff5f5;
+}
+
+.profile-form .form-group input.error:focus,
+.profile-form .form-group textarea.error:focus {
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.profile-form .form-help {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #5f6368;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.profile-form .form-help i {
+  color: #1a73e8;
+}
+
+.profile-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f3f4;
+}
+
+.profile-form .save-btn {
+  position: relative;
+  min-width: 120px;
+}
+
+.profile-form .save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #1a73e8;
+}
+
+.profile-form .save-btn i.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Profile Form Focus States */
+.profile-form .form-group input:focus,
+.profile-form .form-group textarea:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  outline: none;
+}
+
+/* Profile Form Hover States */
+.profile-form .form-group input:hover:not(.error),
+.profile-form .form-group textarea:hover:not(.error) {
+  border-color: #1a73e8;
+}
+
+/* Responsive Adjustments for Profile Form */
+@media (max-width: 768px) {
+  .profile-form .error-message {
+    font-size: 0.85rem;
+  }
+
+  .profile-form .form-help {
+    font-size: 0.8rem;
+  }
+
+  .profile-form .form-actions {
+    flex-direction: column;
+  }
+
+  .profile-form .cancel-btn,
+  .profile-form .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-form .error-message {
+    font-size: 0.8rem;
+  }
+
+  .profile-form .form-help {
+    font-size: 0.75rem;
+  }
 } 
