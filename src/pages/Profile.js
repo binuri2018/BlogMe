@@ -78,7 +78,8 @@ function Profile() {
               id: doc.id,
               ...data,
               createdAt: data.createdAt || new Date(),
-              authorName: data.authorName || 'Anonymous'
+              authorName: data.authorName || 'Anonymous',
+              views: data.views || 0 // Ensure views is initialized
             };
           });
           
@@ -89,10 +90,14 @@ function Profile() {
             return dateB - dateA;
           });
           
+          // Calculate total views
+          const totalViews = blogsData.reduce((sum, blog) => sum + (blog.views || 0), 0);
+          
           setBlogs(blogsData);
           setStats(prev => ({
             ...prev,
             totalBlogs: blogsData.length,
+            totalViews: totalViews,
             lastActive: blogsData.length > 0 ? blogsData[0].createdAt : null
           }));
         }
@@ -156,19 +161,29 @@ function Profile() {
     try {
       if (editingBlog) {
         const blogRef = doc(db, "blogs", editingBlog.id);
-        await updateDoc(blogRef, {
+        const updatedData = {
           ...blogFormData,
           updatedAt: serverTimestamp(),
-        });
-        alert("Blog updated successfully");
-
+          views: editingBlog.views || 0 // Preserve the view count
+        };
+        
+        await updateDoc(blogRef, updatedData);
+        
         // Update the local blogs state
-        setBlogs((prevBlogs) =>
-          prevBlogs.map((b) =>
-            b.id === editingBlog.id ? { ...b, ...blogFormData } : b
-          )
+        const updatedBlogs = blogs.map((b) =>
+          b.id === editingBlog.id ? { ...b, ...updatedData } : b
         );
-
+        
+        // Recalculate total views
+        const totalViews = updatedBlogs.reduce((sum, blog) => sum + (blog.views || 0), 0);
+        
+        setBlogs(updatedBlogs);
+        setStats(prev => ({
+          ...prev,
+          totalViews: totalViews
+        }));
+        
+        alert("Blog updated successfully");
         setEditingBlog(null);
       }
     } catch (error) {
@@ -181,9 +196,21 @@ function Profile() {
   const handleDeleteBlog = async (blogId) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
+        const blogToDelete = blogs.find(blog => blog.id === blogId);
         await deleteDoc(doc(db, "blogs", blogId));
-        // Update local state
-        setBlogs(blogs.filter(blog => blog.id !== blogId));
+        
+        // Update local state and recalculate total views
+        const updatedBlogs = blogs.filter(blog => blog.id !== blogId);
+        const totalViews = updatedBlogs.reduce((sum, blog) => sum + (blog.views || 0), 0);
+        
+        setBlogs(updatedBlogs);
+        setStats(prev => ({
+          ...prev,
+          totalBlogs: updatedBlogs.length,
+          totalViews: totalViews,
+          lastActive: updatedBlogs.length > 0 ? updatedBlogs[0].createdAt : null
+        }));
+        
         alert("Blog deleted successfully");
       } catch (error) {
         console.error("Error deleting blog:", error.message);
