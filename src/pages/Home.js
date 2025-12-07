@@ -1,9 +1,8 @@
 // src/pages/Home.js
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
-import { collection, getDocs, query, orderBy, limit, onSnapshot, doc, updateDoc, increment, getDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc, increment, getDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import AuthorProfileModal from '../components/AuthorProfileModal';
@@ -18,7 +17,6 @@ const Home = () => {
   const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [likedBlogs, setLikedBlogs] = useState(new Set());
-  const navigate = useNavigate();
 
   const categories = [
     { value: 'all', label: 'All Categories' },
