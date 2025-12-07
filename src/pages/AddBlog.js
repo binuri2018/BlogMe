@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import "./AddBlog.css";
 
@@ -101,7 +101,26 @@ function AddBlog() {
       const user = auth.currentUser;
       if (!user) {
         alert("You must be logged in to create a blog");
+        setIsSubmitting(false);
         return;
+      }
+
+      // Fetch user's name from Firestore
+      let authorName = 'Anonymous';
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const firstName = userData.firstName || '';
+          const lastName = userData.lastName || '';
+          if (firstName || lastName) {
+            authorName = `${firstName} ${lastName}`.trim();
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error.message);
+        // Continue with 'Anonymous' if fetch fails
       }
 
       const blogData = {
@@ -111,7 +130,7 @@ function AddBlog() {
         blogImage: blogImage.trim(),
         createdAt: new Date(),
         userId: user.uid,
-        authorName: user.displayName || 'Anonymous',
+        authorName: authorName,
         authorPhotoURL: user.photoURL,
         views: 0,
         lastViewedBy: null,
