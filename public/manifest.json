@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Blog Me",
+  "name": "Blog Me - Modern Blogging Platform",
   "icons": [
     {
       "src": "favicon.ico",
