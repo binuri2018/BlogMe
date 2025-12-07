@@ -30,14 +30,7 @@ function Profile() {
   const [activeTab, setActiveTab] = useState('profile');
   const [editing, setEditing] = useState(false);
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [editingBlog, setEditingBlog] = useState(null);
-  const [blogFormData, setBlogFormData] = useState({
-    title: "",
-    content: "",
-    backgroundImage: "",
-    blogImage: "",
-  });
 
   const [stats, setStats] = useState({
     totalBlogs: 0,
@@ -75,7 +68,6 @@ function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        setLoading(true);
         const user = auth.currentUser;
         if (user) {
           const docRef = doc(db, "users", user.uid);
@@ -135,8 +127,6 @@ function Profile() {
         }
       } catch (error) {
         console.error("Error fetching user blogs:", error.message);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -268,69 +258,13 @@ function Profile() {
       title: capitalizeFirstLetter(blog.title),
       content: capitalizeFirstLetter(blog.content)
     });
-    setBlogFormData({
-      title: capitalizeFirstLetter(blog.title),
-      content: capitalizeFirstLetter(blog.content),
-      backgroundImage: blog.backgroundImage || "",
-      blogImage: blog.blogImage || "",
-    });
   };
 
-  const handleBlogChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'title' || name === 'content') {
-      setBlogFormData(prev => ({
-        ...prev,
-        [name]: capitalizeFirstLetter(value)
-      }));
-    } else {
-      setBlogFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-
-  const handleSaveBlog = async () => {
-    try {
-      if (editingBlog) {
-        const blogRef = doc(db, "blogs", editingBlog.id);
-        const updatedData = {
-          ...blogFormData,
-          updatedAt: serverTimestamp(),
-          views: editingBlog.views || 0 // Preserve the view count
-        };
-        
-        await updateDoc(blogRef, updatedData);
-        
-        // Update the local blogs state
-        const updatedBlogs = blogs.map((b) =>
-          b.id === editingBlog.id ? { ...b, ...updatedData } : b
-        );
-        
-        // Recalculate total views
-        const totalViews = updatedBlogs.reduce((sum, blog) => sum + (blog.views || 0), 0);
-        
-        setBlogs(updatedBlogs);
-        setStats(prev => ({
-          ...prev,
-          totalViews: totalViews
-        }));
-        
-        alert("Blog updated successfully");
-        setEditingBlog(null);
-      }
-    } catch (error) {
-      console.error("Error updating blog:", error.message);
-      alert("Error updating blog. Please try again.");
-    }
-  };
 
   // Add delete blog handler
   const handleDeleteBlog = async (blogId) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
-        const blogToDelete = blogs.find(blog => blog.id === blogId);
         await deleteDoc(doc(db, "blogs", blogId));
         
         // Update local state and recalculate total views
