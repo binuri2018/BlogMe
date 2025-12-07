@@ -58,15 +58,14 @@ npm install
    - Firestore Database
    - Storage (for blog images)
 
-4. Create a `src/firebase.js` file in the root directory and add your Firebase configuration:
-```src/firebase.js
-REACT_APP_FIREBASE_API_KEY=your_api_key
-REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
-REACT_APP_FIREBASE_PROJECT_ID=your_project_id
-REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-REACT_APP_FIREBASE_APP_ID=your_app_id
-```
+4. Set up environment variables:
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Open `.env` and fill in your Firebase configuration values from Firebase Console:
+     - Go to Firebase Console > Project Settings > General > Your apps
+     - Copy the configuration values to your `.env` file
 
 5. Start the development server
 ```bash
@@ -153,6 +152,80 @@ blog-me/
 ├── package.json
 └── README.md
 ```
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import your repository on [Vercel](https://vercel.com)
+3. Add your environment variables in Vercel dashboard:
+   - Go to Project Settings > Environment Variables
+   - Add all `REACT_APP_FIREBASE_*` variables from your `.env` file
+4. Deploy! Vercel will automatically build and deploy your app
+
+### Deploy to Netlify
+
+1. Push your code to GitHub
+2. Import your repository on [Netlify](https://netlify.com)
+3. Configure build settings:
+   - Build command: `npm run build`
+   - Publish directory: `build`
+4. Add environment variables:
+   - Go to Site Settings > Build & Deploy > Environment
+   - Add all `REACT_APP_FIREBASE_*` variables from your `.env` file
+5. Deploy!
+
+### Deploy to Firebase Hosting
+
+1. Install Firebase CLI:
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. Login to Firebase:
+   ```bash
+   firebase login
+   ```
+
+3. Initialize Firebase Hosting:
+   ```bash
+   firebase init hosting
+   ```
+   - Select your Firebase project
+   - Set public directory to `build`
+   - Configure as single-page app: Yes
+   - Set up automatic builds: No
+
+4. Build your app:
+   ```bash
+   npm run build
+   ```
+
+5. Deploy:
+   ```bash
+   firebase deploy --only hosting
+   ```
+
+### Environment Variables for Production
+
+Make sure to set all environment variables in your hosting platform:
+- `REACT_APP_FIREBASE_API_KEY`
+- `REACT_APP_FIREBASE_AUTH_DOMAIN`
+- `REACT_APP_FIREBASE_PROJECT_ID`
+- `REACT_APP_FIREBASE_STORAGE_BUCKET`
+- `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
+- `REACT_APP_FIREBASE_APP_ID`
+
+## 📝 Building for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+This creates an optimized production build in the `build` folder.
 
 ## 👥 Authors
 
